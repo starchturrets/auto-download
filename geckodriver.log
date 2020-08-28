@@ -1,0 +1,42 @@
+1593508847745	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilem66tgA"
+1593509422084	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiled1EkF9"
+1593509681971	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilebfzvuK"
+1593509703238	Marionette	INFO	Listening on port 35987
+1593509703311	Marionette	WARN	TLS certificate errors will be ignored for this session
+1593509711037	Marionette	INFO	Stopped listening on port 35987
+1593510043368	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileMNsyEy"
+1593510064594	Marionette	INFO	Listening on port 43877
+1593510064659	Marionette	WARN	TLS certificate errors will be ignored for this session
+1593510078341	Marionette	ERROR	[24] No reply from Marionette:Register
+1593510078861	Marionette	ERROR	[26] No reply from Marionette:Register
+1593510079340	Marionette	ERROR	[28] No reply from Marionette:Register
+1593510079548	Marionette	ERROR	[30] No reply from Marionette:Register
+1593510079883	Marionette	ERROR	[32] No reply from Marionette:Register
+1593510080171	Marionette	ERROR	[34] No reply from Marionette:Register
+1593510080253	Marionette	ERROR	[36] No reply from Marionette:Register
+1593510080317	Marionette	ERROR	[38] No reply from Marionette:Register
+1593510080350	Marionette	ERROR	[40] No reply from Marionette:Register
+1593510080402	Marionette	ERROR	[42] No reply from Marionette:Register
+1593510080494	Marionette	ERROR	[44] No reply from Marionette:Register
+1593510155786	Marionette	INFO	Stopped listening on port 43877
+1593510162007	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile2LrVj8"
+1593510181447	Marionette	INFO	Listening on port 36757
+1593510181746	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: resource://gre/modules/URIFixup.jsm, line 203: NS_ERROR_FAILURE: Should pass a non-null uri
+1593510188933	Marionette	INFO	Stopped listening on port 36757
+JavaScript error: resource:///modules/FaviconLoader.jsm, line 568: InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x840001,name=PRemoteSpellcheckEngine::Msg___delete__) Channel closing: too late to send/recv, messages will be lost
+
+1593511126892	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileaxAHKp"
+1593511151357	Marionette	INFO	Listening on port 35073
+1593511151619	Marionette	WARN	TLS certificate errors will be ignored for this session
+1593511421363	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileUYayOj"
+1593511437842	Marionette	INFO	Stopped listening on port 35073
+1593511441481	Marionette	INFO	Listening on port 34235
+1593511441580	Marionette	WARN	TLS certificate errors will be ignored for this session
+1593511591684	Marionette	INFO	Stopped listening on port 34235
+1593511629520	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilekWXRWy"
+1593511649865	Marionette	INFO	Listening on port 45129
+1593511649988	Marionette	WARN	TLS certificate errors will be ignored for this session
+1593511814634	Marionette	INFO	Stopped listening on port 45129
