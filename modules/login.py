@@ -2,7 +2,7 @@
 import json
 
 
-def main(browser):
+def login(browser):
 
     def logged_in():
         if len(browser.find_elements_by_css_selector('.exampreparation-tile')) == 0:

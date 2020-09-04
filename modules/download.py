@@ -1,5 +1,3 @@
-
-import login
 import glob
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
@@ -7,16 +5,9 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def main(webdriver):
+def download(webdriver):
 
     print('Downloading teh files!!!')
-
- 
-
-   
-
-
-
 
     items = container_div[1]
 

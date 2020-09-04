@@ -12,7 +12,7 @@ from google.auth.transport.requests import Request
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 
-def main(current):
+def upload(current):
     """Shows basic usage of the Drive v3 API.
     Prints the names and ids of the first 10 files the user has access to.
     """
@@ -131,7 +131,7 @@ def main(current):
     print(files)
     # Loop over array, and upload each pdf to target_id
 
-    def upload(file_name):
+    def upload_file(file_name):
         print('Uploading file...')
         print(file_name)
         metadata = {
@@ -148,4 +148,4 @@ def main(current):
         print('File ID: %s' % file.get('id'))
 
     for file in files:
-        upload(str(file))
+        upload_file(str(file))
