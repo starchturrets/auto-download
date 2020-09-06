@@ -1,5 +1,7 @@
 from __future__ import print_function
 import requests
+import shutil
+import os
 from os import walk
 import pickle
 import os.path
@@ -12,7 +14,7 @@ from google.auth.transport.requests import Request
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 
-def upload(current):
+def upload(term, heading):
     """Shows basic usage of the Drive v3 API.
     Prints the names and ids of the first 10 files the user has access to.
     """
@@ -37,29 +39,19 @@ def upload(current):
 
     service = build('drive', 'v3', credentials=creds)
 
-    # # Call the Drive v3 API
-    # results = service.files().list(
-    #     pageSize=10, fields="nextPageToken, files(id, name)").execute()
-    # items = results.get('files', [])
+    # materials_id = '15f2EopCvhTxil0XX5f9uU2SLehn_LCnV'
 
-    # if not items:
-    #     print('No files found.')
-    # else:
-    #     print('Files:')
-    #     for item in items:
-    #         print(u'{0} ({1})'.format(item['name'], item['id']))
+    terms = ['1HTJK3mwReWfJ0eXjfmsi8M7Hi9IvAglq',
+             '12jnRx5q55rD4RLyE2GzPst8maYY4kEqC',
+             '1aZtNfhjQnqGmG3WinT93HFUFvL204kmh']
 
-    # So first, grab the variable from main.py and store it
-    # Create a folder under Materials (example: T1WK1)
-    # Loop thru ./T1WK1 files and upload them to Materials/T1WK1
+    # Where the downloaded files will be uploaded
 
-    name = current
+    term_folder_id = terms[term - 1]
 
-    materials_id = '15f2EopCvhTxil0XX5f9uU2SLehn_LCnV'
-
-    def create_folder(itemName, id):
+    def create_folder(item_name, id):
         body = {
-            'name': itemName,
+            'name': item_name,
             'mimeType': 'application/vnd.google-apps.folder',
             'parents': [id]
         }
@@ -67,9 +59,9 @@ def upload(current):
         print('Folder created!')
         return root_folder["id"]
 
-    def find_folder(parent_id):
-        query = "mimeType = 'application/vnd.google-apps.folder' and '{parent_id}' in parents and trashed = False".format(
-            parent_id=parent_id)
+    def find_folder(query):
+        query = "mimeType = 'application/vnd.google-apps.folder' and '{term_folder_id}' in parents and trashed = False and name = '{query}'".format(
+            term_folder_id=term_folder_id, query=query)
 
         page_token = None
 
@@ -98,7 +90,7 @@ def upload(current):
         except googleapiclient.errors.HttpError:
             return None
 
-    check = find_folder(materials_id)
+    check = find_folder(heading)
 
     if(check != None):
         # Folder must be replaced!
@@ -117,7 +109,7 @@ def upload(current):
 
         delete_file(service, check)
 
-    target_id = create_folder(name, materials_id)
+    target_id = create_folder(heading, term_folder_id)
 
     print(target_id)
 
@@ -131,12 +123,12 @@ def upload(current):
     print(files)
     # Loop over array, and upload each pdf to target_id
 
-    def upload_file(file_name):
+    def upload_file(file_name, parent_id):
         print('Uploading file...')
         print(file_name)
         metadata = {
             "name": file_name,
-            "parents": [target_id]
+            "parents": [parent_id]
         }
         location = './files/{file}'.format(file=file_name)
         media = googleapiclient.http.MediaFileUpload(
@@ -148,4 +140,11 @@ def upload(current):
         print('File ID: %s' % file.get('id'))
 
     for file in files:
-        upload_file(str(file))
+        upload_file(str(file), target_id)
+
+    shutil.rmtree('files')
+
+    os.makedirs('files')
+
+
+upload(1, 'Week 1')

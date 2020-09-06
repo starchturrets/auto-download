@@ -36,10 +36,8 @@ def download(webdriver):
         text = text.split('.pdf')
 
         if len(text) > 1:
-            # item.click()
-
             print(item.get_attribute('innerText') + 'is a pdf!')
-
+            # item.click()
             hm = False
 
             while hm == False:
@@ -50,6 +48,9 @@ def download(webdriver):
                 else:
                     print('Still downloading!')
                     browser.implicitly_wait(50)
+
+        # Once all items in a week have been downloaded, upload
+        # upload_week(term, heading)
 
     browser.close()
 
