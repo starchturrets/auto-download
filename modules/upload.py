@@ -145,6 +145,3 @@ def upload(term, heading):
     shutil.rmtree('files')
 
     os.makedirs('files')
-
-
-upload(1, 'Week 1')

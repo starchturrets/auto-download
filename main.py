@@ -51,6 +51,7 @@ def main():
         items = week.find_elements_by_css_selector('li div.col-sm-4 span')
         items = items[1::2]
 
+        print(items)
         for item in items:
             browser.execute_script('arguments[0].scrollIntoView(true)', item)
             browser.implicitly_wait(10)
@@ -72,8 +73,9 @@ def main():
                         print('Still downloading!')
                         browser.implicitly_wait(50)
 
-            # Once all items in a week have been downloaded, upload
-            upload_week(term, heading)
+            Once all items in a week have been downloaded, upload
+
+        upload(term, heading)
 
     browser.close()
     # current = download.main()

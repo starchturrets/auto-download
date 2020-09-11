@@ -32,4 +32,11 @@ def get_weeks(browser):
         if len(weeks) > 2:
             shuld_wait = True
 
-    return weeks
+    arr = []
+    # Filter out those mysterious invisible elements
+    for week in weeks:
+        heading = week.find_element_by_css_selector('.panel-heading').text
+        if len(heading) > 0:
+            arr.append(week)
+
+    return arr
