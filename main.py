@@ -73,7 +73,7 @@ def main():
                         print('Still downloading!')
                         browser.implicitly_wait(50)
 
-            Once all items in a week have been downloaded, upload
+            # Once all items in a week have been downloaded, upload
 
         upload(term, heading)
 
