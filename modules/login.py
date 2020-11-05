@@ -27,3 +27,5 @@ def login(browser):
         password.send_keys(credentials[1])
 
         login_btn.click()
+        # browser.execute_script(
+            # 'document.querySelector("#loginButton").click()')

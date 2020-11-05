@@ -48,21 +48,21 @@ def upload(term, heading):
 
     term_folder_id = terms[term - 1]
 
-    def create_folder(item_name, id):
-        body = {
-            'name': item_name,
-            'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [id]
-        }
-        root_folder = drive_service.files().create(body=body).execute()
-        print('Folder created!')
-        return root_folder["id"]
-
-    def find_folder(query):
+    def find_folder(query, term_folder):
         query = "mimeType = 'application/vnd.google-apps.folder' and '{term_folder_id}' in parents and trashed = False and name = '{query}'".format(
             term_folder_id=term_folder_id, query=query)
 
         page_token = None
+
+        def create_folder(item_name, id):
+            body = {
+                'name': item_name,
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [id]
+            }
+            root_folder = drive_service.files().create(body=body).execute()
+            print('Folder created!')
+            return root_folder["id"]
 
         try:
             while True:
@@ -72,11 +72,13 @@ def upload(term, heading):
                 response_arr = response.get('files', [])
 
                 if len(response_arr) == 0:
-                    print('Folder not found!')
-                    folder_id = None
+                    print('Folder not found! Creating...')
+                    folder_id = create_folder(query, term_folder)
+                    return folder_id
                 elif len(response_arr) == 1:
                     folder_id = response_arr[0].get('id')
                     print('folder found!')
+                    return folder_id
                 elif len(response_arr) > 1:
                     print(
                         'Something is not right. There are multiple duplicates of the folder!')
@@ -89,28 +91,28 @@ def upload(term, heading):
         except googleapiclient.errors.HttpError:
             return None
 
-    check = find_folder(heading)
+    target_id = find_folder(heading, term_folder_id)
 
-    if(check != None):
-        # Folder must be replaced!
-        def delete_file(drive_service, file_id):
-            """Permanently delete a file, skipping the trash.
+    # if(check != None):
+    #     # Folder must be replaced!
+    #     def delete_file(drive_service, file_id):
+    #         """Permanently delete a file, skipping the trash.
 
-            Args:
-            service: Drive API service instance.
-            file_id: ID of the file to delete.
-            """
-            try:
-                drive_service.files().delete(fileId=file_id).execute()
-                print('File deleted!')
-            except googleapiclient.errors.HttpError as error:
-                print('An error occurred: {error}'.format(error=error))
+    #         Args:
+    #         service: Drive API service instance.
+    #         file_id: ID of the file to delete.
+    #         """
+    #         try:
+    #             drive_service.files().delete(fileId=file_id).execute()
+    #             print('File deleted!')
+    #         except googleapiclient.errors.HttpError as error:
+    #             print('An error occurred: {error}'.format(error=error))
 
-        delete_file(drive_service, check)
+    #     delete_file(drive_service, check)
 
-    target_id = create_folder(heading, term_folder_id)
+    # target_id = create_folder(heading, term_folder_id)
 
-    print(target_id)
+    # print(target_id)
 
     # Get everything in ./files into an array or something
 

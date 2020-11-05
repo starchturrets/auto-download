@@ -24,7 +24,6 @@ def clear_files():
 
 
 def click_pdf_links(browser, items):
-    print(items)
 
     for item in items:
 
@@ -35,18 +34,27 @@ def click_pdf_links(browser, items):
 
         text = text.split('.pdf')
 
-        if len(text) > 1:
+        color = item.value_of_css_property('color')
+        print(color)
+        # print(color == 'rgb(0, 128, 187)')
+        bool_thing = (color == 'rgba(0, 128, 187, 1)')
+        # Temporary override
+        # bool_thing = True
+        if len(text) > 1 and bool_thing == True:
             print(item.get_attribute('innerText') + ' is a pdf!')
+            # rgb(0, 128, 187)
+
             item.click()
             hm = False
 
             while hm == False:
-                fileList = glob.glob('./files/*.crdownload')
-                if(len(fileList) == 0):
+                def fileList():
+                    return glob.glob('./files/*.crdownload')
+
+                if(len(fileList()) == 0):
                     hm = True
                 else:
-                    print('Still downloading!')
-                    browser.implicitly_wait(500)
+                    browser.implicitly_wait(10)
 
 
 def main():
