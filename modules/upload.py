@@ -49,6 +49,7 @@ def upload(term, heading):
     term_folder_id = terms[term - 1]
 
     def find_folder(query, term_folder):
+        query_2 = query
         query = "mimeType = 'application/vnd.google-apps.folder' and '{term_folder_id}' in parents and trashed = False and name = '{query}'".format(
             term_folder_id=term_folder_id, query=query)
 
@@ -73,7 +74,7 @@ def upload(term, heading):
 
                 if len(response_arr) == 0:
                     print('Folder not found! Creating...')
-                    folder_id = create_folder(query, term_folder)
+                    folder_id = create_folder(query_2, term_folder)
                     return folder_id
                 elif len(response_arr) == 1:
                     folder_id = response_arr[0].get('id')
@@ -90,7 +91,7 @@ def upload(term, heading):
                     break
         except googleapiclient.errors.HttpError:
             return None
-
+    print(heading)
     target_id = find_folder(heading, term_folder_id)
 
     # if(check != None):

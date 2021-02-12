@@ -1,4 +1,4 @@
-import schedule
+# import schedule
 import time
 import shutil
 import os
@@ -35,7 +35,7 @@ def click_pdf_links(browser, items):
         text = text.split('.pdf')
 
         color = item.value_of_css_property('color')
-        print(color)
+        # print(color)
         # print(color == 'rgb(0, 128, 187)')
         bool_thing = (color == 'rgba(0, 128, 187, 1)')
         # Temporary override
