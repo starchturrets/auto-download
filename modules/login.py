@@ -25,7 +25,8 @@ def login(browser):
         login_btn = browser.find_element_by_css_selector('#loginButton')
         username.send_keys(credentials[0])
         password.send_keys(credentials[1])
+        browser.execute_script('arguments[0].scrollIntoView(true)', login_btn)
 
         login_btn.click()
         # browser.execute_script(
-            # 'document.querySelector("#loginButton").click()')
+        # 'document.querySelector("#loginButton").click()')
