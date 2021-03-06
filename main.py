@@ -23,7 +23,7 @@ def clear_files():
     os.makedirs('files')
 
 
-def click_pdf_links(browser, items, click_all):
+def click_pdf_links(browser, items):
 
     for item in items:
 
@@ -37,7 +37,7 @@ def click_pdf_links(browser, items, click_all):
         color = item.value_of_css_property('color')
         # print(color)
         # print(color == 'rgb(0, 128, 187)')
-        bool_thing = click_all or (color == 'rgba(0, 128, 187, 1)')
+        bool_thing = (color == 'rgba(0, 128, 187, 1)')
         # Temporary override
         # bool_thing = True
         if len(text) > 1 and bool_thing == True:
@@ -79,17 +79,15 @@ def main():
         print(heading)
         items = week.find_elements_by_css_selector('li div.col-sm-4 span')
         items = items[1::2]
-        if heading == 'All Weeks':
-            click_pdf_links(browser, items, True)
-        else:
-            click_pdf_links(browser, items, False)
+
+        click_pdf_links(browser, items)
         # Once all items in a week have been downloaded, upload
 
         upload(term, heading)
 
     browser.implicitly_wait(90)
     grid_items = get_grid(browser, term)
-    click_pdf_links(browser, grid_items, True)
+    click_pdf_links(browser, grid_items)
     browser.implicitly_wait(90)
 
     upload(term, 'Grid')
