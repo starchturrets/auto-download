@@ -22,7 +22,6 @@ def get_weeks(browser):
     week = browser.find_elements_by_css_selector(
         'div.filter.data b.ng-binding')[1].text
 
-    print(term)
     term = term.split('Term')[1].strip()
 
     term = int(term)

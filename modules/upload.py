@@ -99,7 +99,8 @@ def upload(term, heading):
         files.extend(filenames)
         break
 
-    print(files)
+    if len(files) > 0:
+        print(files)
 
     def upload_file(file_name, parent_id):
         print('Uploading file...')
