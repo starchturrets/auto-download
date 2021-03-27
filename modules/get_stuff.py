@@ -11,11 +11,6 @@ def get_weeks(browser):
                 (By.CSS_SELECTOR, selector)))
         el.click()
 
-    # element = WebDriverWait(browser, 90).until(
-    #     EC.element_to_be_clickable(
-    #         (By.CSS_SELECTOR, '[ng-class="{selected: documentsCtrl.selectCurrentTermWeek}"]')))
-    # element.click()
-
     wait_and_click(
         '[ng-class="{selected: documentsCtrl.selectCurrentTermWeek}"]')
 
@@ -27,19 +22,10 @@ def get_weeks(browser):
     week = browser.find_elements_by_css_selector(
         'div.filter.data b.ng-binding')[1].text
 
-    # week = int(week.split('Week')[1].strip())
-
-    # term = browser.find_element_by_css_selector(
-    #     'div.filter.data').find_element_by_css_selector('b.ng-binding').text
-    # document.querySelector('.all-week-label label').click()
-    # //click this
     print(term)
     term = term.split('Term')[1].strip()
 
     term = int(term)
-    # browser.refresh()
-    # WebDriverWait(browser, 90).until(
-    # EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.filter.data b.ng-binding'))).text
 
     wait_and_click("""[ng-click="documentsCtrl.filterSelection('Week');"]""")
 
@@ -48,10 +34,6 @@ def get_weeks(browser):
     weeks_length = int(len(browser.find_elements_by_css_selector(
         'div.week-label [ng-repeat="week in documentsCtrl.allWeeks"]'))) / 2
 
-    # browser.find_element_by_css_selector('.all-week-label label').click()
-    # browser.execute_script(
-    #     'document.querySelector(".all-week-label label").click()')
-    # # def wait():
     container_div = browser.find_elements_by_css_selector(
         'div.panel.ng-scope')
 

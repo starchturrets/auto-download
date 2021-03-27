@@ -91,31 +91,8 @@ def upload(term, heading):
                     break
         except googleapiclient.errors.HttpError:
             return None
-    print(heading)
+
     target_id = find_folder(heading, term_folder_id)
-
-    # if(check != None):
-    #     # Folder must be replaced!
-    #     def delete_file(drive_service, file_id):
-    #         """Permanently delete a file, skipping the trash.
-
-    #         Args:
-    #         service: Drive API service instance.
-    #         file_id: ID of the file to delete.
-    #         """
-    #         try:
-    #             drive_service.files().delete(fileId=file_id).execute()
-    #             print('File deleted!')
-    #         except googleapiclient.errors.HttpError as error:
-    #             print('An error occurred: {error}'.format(error=error))
-
-    #     delete_file(drive_service, check)
-
-    # target_id = create_folder(heading, term_folder_id)
-
-    # print(target_id)
-
-    # Get everything in ./files into an array or something
 
     files = []
     for (dirpath, dirnames, filenames) in walk('./files'):
@@ -123,7 +100,6 @@ def upload(term, heading):
         break
 
     print(files)
-    # Loop over array, and upload each pdf to target_id
 
     def upload_file(file_name, parent_id):
         print('Uploading file...')
