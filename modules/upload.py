@@ -40,10 +40,12 @@ def upload(term, heading):
 
     drive_service = login()
 
-    terms = ['1HTJK3mwReWfJ0eXjfmsi8M7Hi9IvAglq',
-             '12jnRx5q55rD4RLyE2GzPst8maYY4kEqC',
-             '1aZtNfhjQnqGmG3WinT93HFUFvL204kmh']
-
+    # terms = ['1HTJK3mwReWfJ0eXjfmsi8M7Hi9IvAglq',
+    #          '12jnRx5q55rD4RLyE2GzPst8maYY4kEqC',
+    #          '1aZtNfhjQnqGmG3WinT93HFUFvL204kmh']
+    terms = ['1uHWkp3CT4P5TtxH3NRG6wcXyJAwyhMNi',
+             '1uIfZd7ytmW2Lw4KleyQYu9eNqh11QZKe',
+             '1uNFUVkqp6Sf8HaRrlesZFurXf34RYfKh']
     # Where the downloaded files will be uploaded
 
     term_folder_id = terms[term - 1]
