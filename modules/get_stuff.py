@@ -66,3 +66,31 @@ def get_grid(browser, term):
         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, 'div.panel > ul.list-group li:not(.ng-hide)')))
 
     return items
+
+
+def get_books(browser, subject):
+    books = subject.find_elements_by_css_selector('ebook-bookshelf-item')
+
+    for book in books:
+        # info_btn = book.find_element_by_css_selector(
+        #     'span.item-info-button')
+        info_btn = WebDriverWait(browser, 90).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, 'span.item-info-button')))
+        # if EC.visibility_of_element_located()
+        browser.execute_script('arguments[0].click()', info_btn)
+        # info_btn.click()
+
+        title_div = WebDriverWait(browser, 90).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.title')))
+
+        title = title_div.get_attribute('innerText')
+        print(title)
+
+        close_btn = browser.find_element_by_css_selector(
+            'button[aria-label="Close"]')
+        close_btn.click()
+        book.click()
+        canvas = WebDriverWait(browser, 90).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, 'canvas')))
+        browser.get('https://master-cms.sabis.net/ebook/bookshelf')
+        # [...document.querySelectorAll('canvas.upper-canvas')].filter(item => item.clientHeight > 0)
