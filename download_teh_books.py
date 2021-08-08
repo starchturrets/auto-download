@@ -1,12 +1,14 @@
 # import schedule
+from selenium.common.exceptions import WebDriverException
+import re
 import time
 import shutil
 import os
 import glob
 import selenium
 from selenium import webdriver
-
-
+import img2pdf
+from PIL import Image
 from modules.setup_browser import setup_browser
 from modules.login import login_ebooks
 # from modules.download import download
@@ -18,6 +20,18 @@ from modules.get_stuff import get_books
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+import natsort
+from PIL import ImageFile
+import shutil
+from selenium.webdriver.common.keys import Keys
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+
+def sorted_alphanumeric(data):
+    def convert(text): return int(text) if text.isdigit() else text.lower()
+    def alphanum_key(key): return [convert(c)
+                                   for c in re.split('([0-9+])', key)]
+    return sorted(data, key=alphanum_key)
 
 
 def clear_files():
@@ -34,11 +48,11 @@ def main():
 
     clear_files()
 
-    os.makedirs('files/' + 'test_directory')
+    # os.makedirs('files/' + 'test_directory')
     browser = setup_browser(webdriver)
 
     browser.get('https://master-cms.sabis.net/login')
-
+    print('y u no login?')
     login_ebooks(browser)
 
     def subjects_list():
@@ -47,7 +61,7 @@ def main():
         return browser.find_elements_by_css_selector(
             '.bookshlef-body > div.ng-star-inserted > ebook-bookshelf-item-slider')
 
-    index_subjects = 0
+    index_subjects = 6
     while index_subjects < len(subjects_list()):
         subject = subjects_list()[index_subjects]
         browser.execute_script(
@@ -65,10 +79,61 @@ def main():
         def books_list():
             return subjects_list()[index_subjects].find_elements_by_css_selector('ebook-bookshelf-item')
 
-        index_books = 0
+        index_books = 1
         while index_books < len(books_list()):
-            book = books_list()[index_books]
-            info_btn = book.find_element_by_css_selector(
+            def book():
+                return books_list()[index_books]
+
+            def await_page_load():
+                WebDriverWait(browser, 15).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'iframe#master.hidden')))
+
+                browser.implicitly_wait(1)
+                iframe_elements = browser.find_elements_by_css_selector(
+                    'div.page-view-wrapper.twoPages')
+
+                if len(iframe_elements) == 2:
+                    # print('Two pages!')
+
+                    WebDriverWait(browser, 15).until(
+                        EC.visibility_of_element_located((By.CSS_SELECTOR, 'iframe#slave:not(.hidden)')))
+                    WebDriverWait(browser, 15).until(
+                        EC.visibility_of_element_located((By.CSS_SELECTOR, 'iframe#master:not(.hidden)')))
+                elif len(iframe_elements) == 0:
+                    # print('Only one page!')
+
+                    WebDriverWait(browser, 15).until(
+                        EC.visibility_of_element_located((By.CSS_SELECTOR, 'iframe#master:not(.hidden)')))
+
+            def screenshot_pages(index_canvas, index_pages):
+                def canvas_list():
+                    return browser.find_elements_by_css_selector(
+                        'canvas.upper-canvas')
+
+                def filter_function(item):
+                    if item.size['height'] > 0:
+                        return True
+                    else:
+                        return False
+                # canvas_list = filter(filter_function, canvas_list())
+                # print(len(canvas_list()))
+                while index_canvas < len(canvas_list()):
+                    # print('yesyomh')
+                    if canvas_list()[index_canvas].size['height'] > 0:
+                        canvas_list()[index_canvas].screenshot('files/' + subject_name +
+                                                               '/' + title + '/' + str(index_pages) + '.png')
+                        index_pages = index_pages + 1
+                    index_canvas = index_canvas + 1
+                return index_pages
+
+            def load_next():
+                # print('Loading next!')
+
+                next_btn = browser.find_elements_by_css_selector(
+                    'div.navigationButton.next')[1]
+                next_btn.click()
+
+            info_btn = book().find_element_by_css_selector(
                 'span.item-info-button')
             browser.execute_script('arguments[0].click()', info_btn)
 
@@ -82,14 +147,210 @@ def main():
                 'button[aria-label="Close"]')
             close_btn.click()
 
-            browser.execute_script('arguments[0].scrollIntoView(true)', book)
+            browser.execute_script('arguments[0].scrollIntoView(true)', book())
             os.makedirs('files/' + subject_name + '/' + title)
 
-            book.click()
-            canvas = WebDriverWait(browser, 90).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'iframe#master')))
+            book().click()
+    #       load first page
+    #       Improve await function
+            # WebDriverWait(browser, 90).until(
+            #     EC.visibility_of_element_located((By.CSS_SELECTOR, 'iframe#master')))
+            index_pages = 0
 
-            canvas.screenshot('files/' + subject_name + '/' + title)
+            index_canvas = 0
+
+            def jump_to_last_page(await_load):
+                # browser.execute_script(
+                #     'document.querySelector(".lastPage").click()')
+                browser.execute_script(
+                    "document.querySelectorAll('div.page-view-wrapper')[1].click()")
+                # browser.execute_script("")
+                input_element = WebDriverWait(browser, 90).until(
+                    EC.visibility_of_element_located((By.CSS_SELECTOR, "input[type='number']")))
+                input_element.send_keys('1047' + Keys.ENTER)
+                await_load()
+                browser.execute_script(
+                    "document.querySelectorAll('div.page-view-wrapper')[0].click()")
+
+            # to_continue = True
+
+            def end_reached():
+                # browser.implicitly_wait(1)
+                hmm = len(browser.find_elements_by_css_selector(
+                    'div.navigationButton.next[hidden]')) == 2
+                # print(hmm)
+                return hmm
+                # return len(browser.find_elements_by_css_selector('div.navigationButton.next[hidden]')) == 2
+
+            def reopen_book(book):
+                browser.get(
+                    'https://master-cms.sabis.net/ebook/bookshelf')
+                book().click()
+                # screenshot_pages()
+
+            # def screenshot_pages():
+
+            # await_page_load()
+            # print('WAITED FOR FIRST PAGE')
+            # jump_to_last_page(await_page_load)
+
+            # load_next()
+            while True:
+
+                try:
+                    # print('Trying...')
+                    await_page_load()
+                    # print(str(end_reached()) + 'hmm')
+
+                    if end_reached() == True:
+                        # print('BREAK BREAK BREAK')
+                        browser.implicitly_wait(1)
+                        # print('Simulating screenshots')
+                        index_pages = screenshot_pages(
+                            index_canvas, index_pages)
+                        break
+
+                    elif end_reached() == False:
+                        # print('Simulating screenshots')
+                        index_pages = screenshot_pages(
+                            index_canvas, index_pages)
+                        load_next()
+                except:
+                    # print('FAILURE')
+                    try:
+                        # print('Trying again...')
+                        reopen_book(book)
+                        await_page_load()
+                        # print(str(end_reached()) + 'hmm')
+
+                        if end_reached() == True:
+                            # print('BREAK BREAK BREAK')
+                            browser.implicitly_wait(1)
+                            # print('Simulating screenshots')
+                            index_pages = screenshot_pages(
+                                index_canvas, index_pages)
+                            break
+
+                        elif end_reached() == False:
+                            # print('Simulating screenshots')
+                            index_pages = screenshot_pages(
+                                index_canvas, index_pages)
+                            load_next()
+                    except:
+                        # print('FAILURE AGAIN')
+                        reopen_book(book)
+                        try:
+                            # print('TRYING AGAIN')
+                            await_page_load()
+                            # print(str(end_reached()) + 'hmm')
+
+                            if end_reached() == True:
+                                # print('BREAK BREAK BREAK')
+                                browser.implicitly_wait(1)
+                                # print('Simulating screenshots')
+                                index_pages = screenshot_pages(
+                                    index_canvas, index_pages)
+                                break
+
+                            elif end_reached() == False:
+                                # print('Simulating screenshots')
+                                index_pages = screenshot_pages(
+                                    index_canvas, index_pages)
+                                load_next()
+                        except:
+                            # print('ANOTHER FAILURE')
+                            reopen_book(book)
+                            try:
+                                # print('LET US DO THIS AGAIN')
+                                await_page_load()
+                                # print(str(end_reached()) + 'hmm')
+
+                                if end_reached() == True:
+                                    # print('BREAK BREAK BREAK')
+                                    browser.implicitly_wait(1)
+                                    # print('Simulating screenshots')
+                                    index_pages = screenshot_pages(
+                                        index_canvas, index_pages)
+                                    break
+
+                                elif end_reached() == False:
+                                    # print('Simulating screenshots')
+                                    index_pages = screenshot_pages(
+                                        index_canvas, index_pages)
+                                    load_next()
+                            except:
+                                # print('AHHH')
+                                reopen_book(book)
+                                await_page_load()
+                                # print(str(end_reached()) + 'hmm')
+
+                                if end_reached() == True:
+                                    # print('BREAK BREAK BREAK')
+                                    browser.implicitly_wait(1)
+                                    # print('Simulating screenshots')
+                                    index_pages = screenshot_pages(
+                                        index_canvas, index_pages)
+                                    break
+
+                                elif end_reached() == False:
+                                    # print('Simulating screenshots')
+                                    index_pages = screenshot_pages(
+                                        index_canvas, index_pages)
+                                    load_next()
+
+            print('Book finished')
+
+            def create_pdf():
+                print('Creating PDF')
+                dirname = 'files/' + subject_name + '/' + title + '/'
+
+                imgs = []
+                for fname in natsort.natsorted(os.listdir(dirname)):
+                    # print(fname)
+                    if not fname.endswith('.png'):
+                        continue
+                    path = os.path.join(dirname, fname)
+                    if os.path.isdir(path):
+                        continue
+                    im = Image.open(path)
+
+                    if im.mode == 'RGBA':
+                        # print('Converting!')
+                        im = im.convert('RGB')
+                    imgs.append(im)
+                imgs[0].save('files/' + subject_name + '/' + title + '.pdf', save_all=True,
+                             quality=100, append_images=imgs[1:])
+                shutil.rmtree(dirname)
+                # for file in os.listdir(dirname):
+                #     path = os.path.join(dirname, file)
+                #     if os.path.isdir(path):
+                #         continue
+                #     if file.endswith('.png'):
+                #         os.remove(file)
+                # imgs = []
+                # for fname in sorted(os.listdir(dirname)):
+                #     print(fname)
+                #     if not fname.endswith('.png'):
+                #         continue
+                #     path = os.path.join(dirname, fname)
+                #     if os.path.isdir(path):
+                #         continue
+                #     im = Image.open(path)
+
+                #     if im.mode == 'RGBA':
+                #         print('Converting!')
+                #         im = im.convert('RGB')
+                #     im.save(path)
+                #     # im.background_color = Color('White')
+                #     # im.alpha_channel = 'remove'
+                #     print(path)
+                #     imgs.append(path)
+                # # for img in imgs:
+                #     # img.convert('RGB')
+                # with open(dirname + title + '.pdf', 'wb') as f:
+                #     f.write(img2pdf.convert(imgs))
+
+            create_pdf()
             browser.get('https://master-cms.sabis.net/ebook/bookshelf')
             index_books = index_books + 1
 

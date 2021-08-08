@@ -1,5 +1,8 @@
 
 import json
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 def login(browser):
@@ -40,6 +43,9 @@ def login_ebooks(browser):
         with open('./webschool_credentials.json') as file:
             credentials = json.loads(file.read())
             return [credentials['username'], credentials['password']]
+
+    WebDriverWait(browser, 90).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, 'input[placeholder="Username"]')))
 
     if logged_in() == False:
         [username, password] = get_credentials()
