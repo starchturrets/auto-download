@@ -1,4 +1,5 @@
 # import schedule
+import os.path
 from selenium.common.exceptions import WebDriverException
 import re
 import time
@@ -46,7 +47,7 @@ def create_folder(name, parent_dir):
 
 def main():
 
-    clear_files()
+    # clear_files()
 
     # os.makedirs('files/' + 'test_directory')
     browser = setup_browser(webdriver)
@@ -71,7 +72,8 @@ def main():
         subject_name = subject_name.get_attribute('innerText')
 
         print('Subject: ' + subject_name)
-        os.makedirs('files/' + subject_name)
+        if os.path.exists('files/' + subject_name) == False:
+            os.makedirs('files/' + subject_name)
 
         books = subject.find_elements_by_css_selector(
             'ebook-bookshelf-item')
@@ -79,7 +81,7 @@ def main():
         def books_list():
             return subjects_list()[index_subjects].find_elements_by_css_selector('ebook-bookshelf-item')
 
-        index_books = 1
+        index_books = 0
         while index_books < len(books_list()):
             def book():
                 return books_list()[index_books]

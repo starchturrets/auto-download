@@ -4,4 +4,5 @@ token.pickle
 files/
 __pycache__/
 new-pdfs/
-
+.idea/
+.vscode/

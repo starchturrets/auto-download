@@ -62,7 +62,8 @@ def main():
     clear_files()
 
     browser = setup_browser(webdriver)
-
+    # os.system(
+    #     'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
     browser.get('https://sdpauth.sabis.net/')
 
     login(browser)
@@ -82,7 +83,18 @@ def main():
 
         click_pdf_links(browser, items)
         # Once all items in a week have been downloaded, upload
+        hm = False
 
+        while hm == False:
+            browser.implicitly_wait(3)
+
+            def fileList():
+                return glob.glob('./files/*.crdownload')
+
+            if(len(fileList()) == 0):
+                hm = True
+            else:
+                browser.implicitly_wait(10)
         upload(term, heading)
 
     browser.implicitly_wait(90)
@@ -91,9 +103,11 @@ def main():
     browser.implicitly_wait(90)
 
     upload(term, 'Grid')
+    # os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')
 
     browser.close()
 
 
 if __name__ == '__main__':
     main()
+    # print(len(glob.glob('./files/*.crdownload')))

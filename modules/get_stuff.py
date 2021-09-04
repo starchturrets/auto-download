@@ -19,19 +19,22 @@ def get_weeks(browser):
     term = WebDriverWait(browser, 90).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.filter.data b.ng-binding'))).text
 
-    week = browser.find_elements_by_css_selector(
-        'div.filter.data b.ng-binding')[1].text
+    # week = browser.find_elements_by_css_selector(
+    # 'div.filter.data b.ng-binding')[1].text
+    # print(week)
 
     term = term.split('Term')[1].strip()
-
+    # week = week.split('Week')[1].strip()
+    # week = int(week) + 1
     term = int(term)
-
+    # print('TERM')
+    # print(term)
     wait_and_click("""[ng-click="documentsCtrl.filterSelection('Week');"]""")
 
     wait_and_click('.all-week-label span')
 
-    weeks_length = int(len(browser.find_elements_by_css_selector(
-        'div.week-label [ng-repeat="week in documentsCtrl.allWeeks"]'))) / 2
+    # weeks_length = int(len(browser.find_elements_by_css_selector(
+    # 'div.week-label [ng-repeat="week in documentsCtrl.allWeeks"]'))) / 2
 
     container_div = browser.find_elements_by_css_selector(
         'div.panel.ng-scope')
@@ -40,13 +43,20 @@ def get_weeks(browser):
     weeks = browser.find_elements_by_css_selector(
         'div.panel.ng-scope')
 
-    while shuld_wait == True:
-        browser.implicitly_wait(10)
-        weeks = browser.find_elements_by_css_selector(
-            'div.panel.ng-scope')
+    # elements = browser.find_elements_by_css_selector(
+    # '.panel-heading:not(.collapsed)')
+    WebDriverWait(browser, 90).until(
+        EC.visibility_of_all_elements_located((By.CSS_SELECTOR, '.panel-heading:not(.collapsed)')))
+    print('hmm')
+    # while shuld_wait == True:
+    #     print(len(elements))
+    #     browser.implicitly_wait(10)
 
-        if len(weeks) > weeks_length:
-            shuld_wait = False
+    #     if len(elements) == week:
+    #         shuld_wait = False
+
+    weeks = browser.find_elements_by_css_selector(
+        'div.panel.ng-scope')
 
     arr = []
     # Filter out those mysterious invisible elements

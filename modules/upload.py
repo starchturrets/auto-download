@@ -51,6 +51,12 @@ def upload(term, heading):
     term_folder_id = terms[term - 1]
 
     def find_folder(query, term_folder):
+        if query == 'All Weeks':
+            print('ALL WEEKS')
+            return '1hPz7QSpI1tAGGhn0OyBhv_iDPfuLTWrr'
+        elif query == 'Grid':
+            print('GRID')
+            return '1FN5avWUtt_b7lG1jfoFnwumIoD3oEYzs'
         query_2 = query
         query = "mimeType = 'application/vnd.google-apps.folder' and '{term_folder_id}' in parents and trashed = False and name = '{query}'".format(
             term_folder_id=term_folder_id, query=query)
