@@ -1,4 +1,3 @@
-# import schedule
 import os.path
 from selenium.common.exceptions import WebDriverException
 import re
@@ -12,12 +11,8 @@ import img2pdf
 from PIL import Image
 from modules.setup_browser import setup_browser
 from modules.login import login_ebooks
-# from modules.download import download
-# from modules.upload import upload
-# from modules.get_stuff import get_weeks
-# from modules.get_stuff import get_grid
+
 from modules.get_stuff import get_books
-# from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -323,34 +318,6 @@ def main():
                 imgs[0].save('files/' + subject_name + '/' + title + '.pdf', save_all=True,
                              quality=100, append_images=imgs[1:])
                 shutil.rmtree(dirname)
-                # for file in os.listdir(dirname):
-                #     path = os.path.join(dirname, file)
-                #     if os.path.isdir(path):
-                #         continue
-                #     if file.endswith('.png'):
-                #         os.remove(file)
-                # imgs = []
-                # for fname in sorted(os.listdir(dirname)):
-                #     print(fname)
-                #     if not fname.endswith('.png'):
-                #         continue
-                #     path = os.path.join(dirname, fname)
-                #     if os.path.isdir(path):
-                #         continue
-                #     im = Image.open(path)
-
-                #     if im.mode == 'RGBA':
-                #         print('Converting!')
-                #         im = im.convert('RGB')
-                #     im.save(path)
-                #     # im.background_color = Color('White')
-                #     # im.alpha_channel = 'remove'
-                #     print(path)
-                #     imgs.append(path)
-                # # for img in imgs:
-                #     # img.convert('RGB')
-                # with open(dirname + title + '.pdf', 'wb') as f:
-                #     f.write(img2pdf.convert(imgs))
 
             create_pdf()
             browser.get('https://master-cms.sabis.net/ebook/bookshelf')
