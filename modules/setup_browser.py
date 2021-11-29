@@ -1,6 +1,15 @@
-def setup_browser(webdriver):
-    options = webdriver.ChromeOptions()
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
 
+from webdriver_manager.chrome import ChromeDriverManager
+
+
+def setup_browser():
+    driver: webdriver = webdriver.Chrome(ChromeDriverManager().install())
+
+    # opt = webdriver.c
+    options: Options = webdriver.ChromeOptions()
+    # options = webdriver.opt
     # options.add_argument(
     #     'download.default_directory=/home/james/programming/auto-download/files')
     # options.add_argument('--no-sandbox')
@@ -10,6 +19,7 @@ def setup_browser(webdriver):
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
     # options.add_argument('window-size=1400,200')
     options.add_argument('--remote-debugging-port=9322')
+    options.add_argument('--hide-scrollbars')
     # prefs = {
     #     'download': {'default_directory': '/home/james/programming/auto-download/files', 'directory_upgrade': True}}
     # options.add_experimental_option('prefs', prefs)

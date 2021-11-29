@@ -55,9 +55,12 @@ def login_ebooks(browser):
             'input[placeholder="Password"]')
         username_input.send_keys(username)
         password_input.send_keys(password)
-
+        browser.execute_script(
+            "document.querySelector('a.accept.button').click()")
         login_btn = browser.find_element_by_css_selector('button.login-btn')
         browser.execute_script(
             'arguments[0].removeAttribute("disabled")', login_btn)
+        # browser.execute_script(
+        #     "document.querySelector('div.cookie-bar').style.display = 'none'")
         login_btn.click()
         print('Logging in!')

@@ -1,4 +1,4 @@
-# import schedule
+import schedule
 import time
 import shutil
 import os
@@ -6,13 +6,13 @@ import glob
 import selenium
 from selenium import webdriver
 
-
 from modules.setup_browser import setup_browser
 from modules.login import login
 from modules.download import download
 from modules.upload import upload
 from modules.get_stuff import get_weeks
 from modules.get_stuff import get_grid
+from webdriver_manager.chrome import ChromeDriverManager
 
 # from selenium.webdriver.common.keys import Keys
 
@@ -60,8 +60,10 @@ def click_pdf_links(browser, items):
 def main():
 
     clear_files()
-
-    browser = setup_browser(webdriver)
+    # driver = webdriver.Chrome(ChromeDriverManager().install())
+    # driver = webdriver.Chrome('/usr/local/share/chromedriver~')
+    # driver = webdriver.Chrome()
+    browser = setup_browser()
     # os.system(
     #     'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
     browser.get('https://sdpauth.sabis.net/')
@@ -71,7 +73,8 @@ def main():
     browser.get(
         'https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=&scid=q7x6PiPCfek%3D')
 
-    [weeks, term] = get_weeks(browser)
+    term = 1
+    weeks = get_weeks(browser)
 
     print('It is term: {term}'.format(term=term))
 
@@ -110,4 +113,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+    schedule.every(5).minutes.do(main)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
     # print(len(glob.glob('./files/*.crdownload')))
