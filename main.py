@@ -112,9 +112,15 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    schedule.every(5).minutes.do(main)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    def do():
+        main()
+        schedule.every(5).minutes.do(main)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    try:
+        do()
+    except selenium.common.exceptions.TimeoutException:
+        print('TIMEOUT FAILURE TRYING AGAIN')
+        do()
     # print(len(glob.glob('./files/*.crdownload')))

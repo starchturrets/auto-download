@@ -56,15 +56,15 @@ def get_weeks(browser):
 
     container_div = browser.find_elements_by_css_selector(
         'div.panel.ng-scope')
-
+    WebDriverWait(browser, 900).until(
+        EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+    browser.implicitly_wait(20)
     shuld_wait = True
-    weeks = browser.find_elements_by_css_selector(
-        'div.panel.ng-scope')
+    # weeks = browser.find_elements_by_css_selector(
+    #     'div.panel.ng-scope')
 
     # elements = browser.find_elements_by_css_selector(
     # '.panel-heading:not(.collapsed)')
-    WebDriverWait(browser, 900).until(
-        EC.visibility_of_all_elements_located((By.CSS_SELECTOR, '.panel-heading:not(.collapsed)')))
     print('hmm')
     # while shuld_wait == True:
     #     print(len(elements))

@@ -28,14 +28,81 @@ def crop():
     path = '/home/james/programming/auto-download/screenshots'
     dirs = os.listdir(path)
     for item in dirs:
-        print(item)
+        # print(item)
         fullpath = os.path.join(path, item)
         if os.path.isfile(fullpath):
             im = Image.open(fullpath)
             f, e = os.path.splitext(fullpath)
-            print(item)
+            # print(item)
             imcrop = im.crop((447, 179, 1903, 1080))
             imcrop.save(f+'.png', 'PNG', quality=100)
+
+
+def get_questions(browser, title):
+    print('')
+
+    def sus():
+        browser.switch_to.frame("correctQuizQuestionActivity")
+        p = browser.find_elements_by_css_selector('p.MsoNormal')
+        if len(p) > 0:
+            if "NS Math" in title:
+                for item in p:
+                    browser.execute_script(
+                        "arguments[0].setAttribute('style', 'padding-bottom: 12px;')", item)
+        browser.switch_to.default_content()
+    table = WebDriverWait(browser, 90).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, 'table.quiz-result-table')))
+
+    browser.execute_script(
+        'angular.element(document.querySelector("div.quiz-result")).scope().onlineQuizResultCtrl.quizResultsEntries.forEach(ans=> ans.hasAnswer="enabled")')
+    browser.implicitly_wait(10)
+
+    # document.querySelectorAll('table.quiz-result-table tr')
+    questions = browser.find_elements_by_css_selector(
+        'table.quiz-result-table tr.ng-scope')
+
+    for index, question in enumerate(questions):
+        question.click()
+        # if index == 0:
+        #     print('wait one')
+        #     WebDriverWait(browser, 90).until(
+        #         EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.correct-answer-image')))
+        WebDriverWait(browser, 900).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+
+        browser.find_element_by_css_selector(
+            'div.correct-answer-image').click()
+        # wait for correct answer
+        WebDriverWait(browser, 90).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.odt-panel-hidden-remove')))
+        print(1)
+        WebDriverWait(browser, 90).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.odt-panel-hidden-remove-active')))
+        print(2)
+        WebDriverWait(browser, 90).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.content.animate-right-content')))
+        print(3)
+        # screenshot
+        browser.implicitly_wait(1)
+        sus()
+        print('screenshotting: ' + str(index))
+        path = 'screenshots/' + str(index) + '.png'
+        browser.implicitly_wait(1)
+        browser.save_screenshot(path)
+        browser.implicitly_wait(1)
+        # click exit button
+        close_btn = browser.find_element_by_css_selector(
+            'div.quiz-panel-close-btn')
+        close_btn.click()
+        # wait again
+        WebDriverWait(browser, 900).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+        # WebDriverWait(browser, 90).until(
+        #     EC.presence_of_element_located((By.CSS_SELECTOR, 'div.correct-answer-selected-image-remove')))
+        # WebDriverWait(browser, 90).until(
+        #     EC.presence_of_element_located((By.CSS_SELECTOR, 'div.content.animate-right-content.odt-panel-hidden')))
+
+    crop()
 
 
 def clear_files():
@@ -46,6 +113,8 @@ def clear_files():
     shutil.rmtree('screenshots')
 
     os.makedirs('screenshots')
+
+# angular.element(document.querySelector("div.quiz-result")).scope().onlineQuizResultCtrl.quizResultsEntries.forEach(ans=>ans.hasAnswer="enabled")
 
 
 def click_pdf_links(browser, items):
@@ -89,173 +158,66 @@ def open_quiz(browser, item):
     print('opening quiz!')
     browser.execute_script('arguments[0].scrollIntoView(true)', item)
 
+    def quiz_done():
+        radio_btn = browser.find_element_by_css_selector(
+            'input[type="radio"][value="viewHistoryRdb"]')
+        # return radio_btn.is_displayed()
+        return False
     item.click()
     WebDriverWait(browser, 90).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#QuizDescription')))
 
-    radio_btn = browser.find_element_by_css_selector(
-        'input[type="radio"][value="viewHistoryRdb"]')  # ng-hide="!documentsCtrl.popupOnlineQuizModelCenter.hasHistory"
-    if(radio_btn.is_displayed()):
-        quizId = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupId")
-        isDeleted = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.isDeleted")
-        QuizLevelSectionId = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupQuizLevelSectionId")
-        selectedQuizSessionId = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId")
-        # print(id)
-        # https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D
+   # ng-hide="!documentsCtrl.popupOnlineQuizModelCenter.hasHistory"
+    quizId = browser.execute_script(
+        "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupId")
+    isDeleted = browser.execute_script(
+        "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.isDeleted")
+    QuizLevelSectionId = browser.execute_script(
+        "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupQuizLevelSectionId")
+    selectedQuizSessionId = browser.execute_script(
+        "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId")
+    # print(id) "&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId="
+    # https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D
+    # account = '&accountId=makQjpBwEjI%3D&selectedQuizSessionId='
+    account = '&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId='
+
+    def create_pdf():
+        print('Creating PDF')
+        dirname = 'screenshots/'
+
+        imgs = []
+        for fname in natsort.natsorted(os.listdir(dirname)):
+            # print(fname)
+            if not fname.endswith('.png'):
+                continue
+            path = os.path.join(dirname, fname)
+            if os.path.isdir(path):
+                continue
+            im = Image.open(path)
+
+            if im.mode == 'RGBA':
+                # print('Converting!')
+                im = im.convert('RGB')
+            imgs.append(im)
+        imgs[0].save('files/' + title + '.pdf', save_all=True,
+                     quality=100, append_images=imgs[1:])
+    if(quiz_done() == True):
 
         # https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=fsqh8%2Fu5ByQ%3D&scid=q7x6PiPCfek%3D
         # 9LSVbWcCJbhokrN%2FCOQORw%3D%3D
         url = "https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D"
         url = "https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=" + \
             quizId + "&isDeleted=" + str(isDeleted) + "&quizLevelSectionId=" + \
-            QuizLevelSectionId + "&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=" + \
+            QuizLevelSectionId + account + \
             selectedQuizSessionId + "&scid=q7x6PiPCfek%3D"
         browser.execute_script("window.open()")
         browser.switch_to.window(browser.window_handles[1])
         browser.get(url)
 
-        # browser.find_element_by
-        # radio_btn.click()
-        # browser.find_element_by_css_selector(
-        #     'button#activeOkBtn').click()
+        get_questions(browser, title)
 
-        table = WebDriverWait(browser, 90).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, 'table.quiz-result-table')))
-        table.find_elements_by_css_selector('tr')[1].click()
-
-        ans = WebDriverWait(browser, 90).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, '.student-answer-image')))
-
-        ans.click()
-
-        def wait_for_answer():
-            print('')
-            WebDriverWait(browser, 90).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.questionHolder')))
-
-        def next_btn_exists():
-            return browser.find_element_by_css_selector('div.next-tabs').is_displayed()
-        index_questions = 0
-        # browser.execute_script(
-        #     "document.querySelector('div.cookie-bar').style.display = 'none'")
-        while True:
-            browser.execute_script(
-                "document.querySelector('iframe#correctQuizQuestionActivity').style.marginLeft = '10px'")
-            browser.execute_script(
-                "document.querySelector('iframe#correctQuizQuestionActivity').style.paddingLeft = '10px'")
-            # WebDriverWait(browser, 90).until(
-            #     EC.NoSuchElementException((By.CSS_SELECTOR, 'div.questionHolder')))
-            # while len(browser.find_elements_by_css_selector('div#preview > *')) != 1:
-            #     browser.implicitly_wait(1)
-            correct = WebDriverWait(browser, 90).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.correct-answer-image')))
-            # correct = browser.find_elements_by_css_selector(
-            #     'div.correct-answer-image')
-            correct.click()
-            WebDriverWait(browser, 90).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.odt-panel-hidden-remove')))
-            panel = WebDriverWait(browser, 90).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.animate-right-content')))
-            # EC.NoSuchElementException
-            browser.implicitly_wait(1)
-            # browser.find_element_by_css_selector('iframe#correctQuizQuestionActivity').screenshot(
-            # 'screenshots' + '/' + title + '/' + str(index_questions) + '.png')
-            path = 'screenshots/' + str(index_questions) + '.png'
-            # browser.find_element_by_css_selector(
-
-            def sus():
-                browser.switch_to.frame("correctQuizQuestionActivity")
-                p = browser.find_elements_by_css_selector('p.MsoNormal')
-                if len(p) > 0:
-                    if "Math" in title:
-                        for item in p:
-                            browser.execute_script(
-                                "arguments[0].setAttribute('style', 'padding-bottom: 12px;')", item)
-                    # elif "Math" not in title:
-                    #     browser.execute_script(
-                    #         "arguments[0].setAttribute('style', 'padding: 20px;')", p[0])
-                # browser.execute_script(
-                #     "document.querySelector('p.MsoNormal').setAttribute('style', 'padding:20px')")
-                # browser.execute_script(
-                browser.switch_to.default_content()
-                #     "let style = document.createElement('style');style.innerHTML='div::-webkit-scrollbar {display:none !important}p.MsoNormal{padding:15px}';document.head.appendChild(style);")
-            #     'iframe#correctQuizQuestionActivity').screenshot(path)
-            sus()
-            browser.implicitly_wait(2)
-
-            # browser.execute_script(
-            #     "document.querySelector('p.MsoNormal').style.padding = '15px'")
-            browser.save_screenshot(path)
-            print('screenshoting + ' + str(index_questions))
-            # print('Simulating screenshot of question')
-            index_questions = index_questions + 1
-            browser.find_element_by_css_selector('div.next-tabs').click()
-            if next_btn_exists() == False:
-                correct = WebDriverWait(browser, 90).until(
-                    EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.correct-answer-image')))
-                correct.click()
-
-                WebDriverWait(browser, 90).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.odt-panel-hidden-remove')))
-                panel = WebDriverWait(browser, 90).until(
-                    EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.animate-right-content')))
-                # EC.NoSuchElementException
-                browser.implicitly_wait(1)
-                # browser.find_element_by_css_selector('iframe#correctQuizQuestionActivity').screenshot(
-                # 'screenshots' + '/' + title + '/' + str(index_questions) + '.png')
-                path = 'screenshots/' + str(index_questions) + '.png'
-                # browser.find_element_by_css_selector('div.next-tabs').click()
-                sus()
-                browser.implicitly_wait(2)
-                browser.save_screenshot(path)
-                break
-        # # print('Simulating screenshot of final question!')
-        # correct.click()
-        # # WebDriverWait(browser, 90).until(
-        # #     EC.presence_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.odt-panel-hidden-remove')))
-        # # panel = WebDriverWait(browser, 90).until(
-        # #     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.animate-right-content')))
-        # # browser.implicitly_wait(1)
-        # # browser.execute_script(
-        # #     "document.querySelector('iframe#correctQuizQuestionActivity').style.marginLeft = '10px'")
-        # browser.implicitly_wait(5)
-        # # browser.find_element_by_css_selector(
-        # #     'iframe#correctQuizQuestionActivity').screenshot(path)
-
-        # sus()
-        # # browser.execute_script(
-        # #     "document.querySelector('p.MsoNormal').style.padding = '15px'")
-        # browser.save_screenshot(path)
-        # browser.implicitly_wait(5)
-        # crop()
-        crop()
-
-        def create_pdf():
-            print('Creating PDF')
-            dirname = 'screenshots/'
-
-            imgs = []
-            for fname in natsort.natsorted(os.listdir(dirname)):
-                # print(fname)
-                if not fname.endswith('.png'):
-                    continue
-                path = os.path.join(dirname, fname)
-                if os.path.isdir(path):
-                    continue
-                im = Image.open(path)
-
-                if im.mode == 'RGBA':
-                    # print('Converting!')
-                    im = im.convert('RGB')
-                imgs.append(im)
-            imgs[0].save('files/' + title + '.pdf', save_all=True,
-                         quality=100, append_images=imgs[1:])
-            # shutil.rmtree(dirname)
-            # os.makedirs('screenshots')
+        # shutil.rmtree(dirname)
+        # os.makedirs('screenshots')
         create_pdf()
 
         for filename in os.listdir('/home/james/programming/auto-download/files'):
@@ -268,16 +230,34 @@ def open_quiz(browser, item):
         browser.switch_to.window(browser.window_handles[0])
 
         browser.find_element_by_css_selector('#activeCancelBtn').click()
-        # browser.find_element_by_css_selector(
-        #     'div[title="Finish Quiz"] button').click()
-        # browser.implicitly_wait(3)
-        # browser.get(
-        #     'https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=&scid=q7x6PiPCfek%3D')
-        # WebDriverWait(browser, 900).until(
-        #     EC.element_to_be_clickable(
-        #         (By.CSS_SELECTOR, """[ng-click="documentsCtrl.filterSelection('Week');"]""")))
-    elif(radio_btn.is_displayed() == False):
+
+    elif(quiz_done() == False):
         print('Quiz has not yet been attempted')
+        # popupid, popupquizlevelsectionid, scid, accountid, sessionid
+
+        url = 'https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizNavigation?id=YbYsNsltrPE%3D&quizLevelSectionId=6wg49xZNvUI%3D&scid=q7x6PiPCfek%3D&accountId=fsqh8%2Fu5ByQ%3D&sessionId=ZwhGsEbWw81VA2ac%2Bhlbag%3D%3D'
+
+        url = 'https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizNavigation?id=' + str(quizId) + '&quizLevelSectionId=' + str(
+            QuizLevelSectionId) + '&scid=q7x6PiPCfek%3D&accountId=fsqh8%2Fu5ByQ%3D&sessionId=' + str(selectedQuizSessionId)
+        browser.execute_script("window.open()")
+        browser.switch_to.window(browser.window_handles[1])
+        browser.get(url)
+        # submit quiz (twice)
+
+        def submit_btn():
+            return WebDriverWait(browser, 90).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, '[ng-click="onlineQuizNavigationCtrl.submitQuiz(true)"]')))
+        submit_btn().click()
+        WebDriverWait(browser, 90).until(EC.alert_is_present())
+        browser.switch_to.alert.accept()
+        submit_btn().click()
+        WebDriverWait(browser, 90).until(EC.alert_is_present())
+        browser.switch_to.alert.accept()
+        get_questions(browser, title)
+        create_pdf()
+        browser.close()
+        browser.switch_to.window(browser.window_handles[0])
+
         browser.find_element_by_css_selector('button#activeCancelBtn').click()
         browser.implicitly_wait(1)
 
@@ -304,8 +284,11 @@ def main():
     weeks.pop(0)
 
     print('It is term: {term}'.format(term=term))
+    browser.implicitly_wait(1)
     browser.execute_script(
         "document.querySelector('a.accept.button').click()")
+    browser.implicitly_wait(15)
+    print(len(weeks))
     for week in weeks:
         heading = week.find_element_by_css_selector('.panel-heading').text
         files = get_files(heading)
