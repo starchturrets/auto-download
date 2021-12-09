@@ -5,7 +5,7 @@ import os
 import glob
 import selenium
 from selenium import webdriver
-
+import json
 from modules.setup_browser import setup_browser
 from modules.login import login
 from modules.download import download
@@ -13,8 +13,14 @@ from modules.upload import upload
 from modules.get_stuff import get_weeks
 from modules.get_stuff import get_grid
 from webdriver_manager.chrome import ChromeDriverManager
-
+from modules.better_quiz_grabber import better_quiz_grabber
 # from selenium.webdriver.common.keys import Keys
+
+
+def get_credentials():
+    with open('./webschool_credentials.json') as file:
+        credentials = json.loads(file.read()).credentials_test
+        return credentials
 
 
 def clear_files():
@@ -57,7 +63,7 @@ def click_pdf_links(browser, items):
                     browser.implicitly_wait(10)
 
 
-def main():
+def main(username, password):
 
     clear_files()
     # driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -68,7 +74,7 @@ def main():
     #     'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
     browser.get('https://sdpauth.sabis.net/')
 
-    login(browser)
+    login(browser, username, password)
 
     browser.get(
         'https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=&scid=q7x6PiPCfek%3D')
@@ -112,15 +118,30 @@ def main():
 
 
 if __name__ == '__main__':
-    def do():
-        main()
-        schedule.every(5).minutes.do(main)
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-    try:
-        do()
-    except selenium.common.exceptions.TimeoutException:
-        print('TIMEOUT FAILURE TRYING AGAIN')
-        do()
+    # def do():
+    #     try:
+    #         credentials = get_credentials()
+    #         for credential in credentials:
+    #             [username ,password] = credential
+    #             main(username, password)
+    #             schedule.every(5).minutes.do(main)
+    #             while True:
+    #                 schedule.run_pending()
+    #                 time.sleep(1)
+    #     except:
+    #         print('TIMEOUT FAILURE TRYING AGAIN')
+    #         do()
+    # do()
+    # try:
+    #     do()
+    # # except selenium.common.exceptions.TimeoutException:
+    # except:
+    #     print('TIMEOUT FAILURE TRYING AGAIN')
+    #     do()
     # print(len(glob.glob('./files/*.crdownload')))
+
+    credentials = get_credentials()
+    for credential in credentials:
+        [username, password, account_id] = credential
+        main(username, password)
+        better_quiz_grabber(username, account_id)

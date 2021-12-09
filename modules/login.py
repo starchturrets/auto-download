@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def login(browser):
+def login(browser, username, password):
 
     def logged_in():
         if len(browser.find_elements_by_css_selector('.exampreparation-tile')) == 0:
@@ -19,15 +19,15 @@ def login(browser):
             return [credentials['username'], credentials['password']]
 
     if logged_in() == False:
-        credentials = get_credentials()
+        # credentials = get_credentials()
 
-        username = browser.find_element_by_css_selector('#username')
+        username_el = browser.find_element_by_css_selector('#username')
 
-        password = browser.find_element_by_css_selector('#password')
+        password_el = browser.find_element_by_css_selector('#password')
 
         login_btn = browser.find_element_by_css_selector('#loginButton')
-        username.send_keys(credentials[0])
-        password.send_keys(credentials[1])
+        username_el.send_keys(username)
+        password_el.send_keys(password)
         browser.execute_script('arguments[0].scrollIntoView(true)', login_btn)
 
         login_btn.click()
