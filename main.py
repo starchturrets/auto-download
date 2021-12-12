@@ -10,6 +10,7 @@ from modules.setup_browser import setup_browser
 from modules.login import login
 from modules.download import download
 from modules.upload import upload
+from modules.upload import list_all_files
 from modules.get_stuff import get_weeks
 from modules.get_stuff import get_grid
 from webdriver_manager.chrome import ChromeDriverManager
@@ -19,7 +20,8 @@ from modules.better_quiz_grabber import better_quiz_grabber
 
 def get_credentials():
     with open('./webschool_credentials.json') as file:
-        credentials = json.loads(file.read()).credentials_test
+        credentials = json.loads(file.read())["credentials_test"]
+        print(credentials)
         return credentials
 
 
@@ -29,7 +31,7 @@ def clear_files():
     os.makedirs('files')
 
 
-def click_pdf_links(browser, items):
+def click_pdf_links(browser, items, all_files):
 
     for item in items:
 
@@ -42,28 +44,40 @@ def click_pdf_links(browser, items):
 
         color = item.value_of_css_property('color')
         # print(color)
+        # 2122 Course Revision Questions History Level N (2yr course) - AK.pdf is a pdf!
+# 2122 Course Revision Questions History Level N (2yr course).pdf is a pdf!
+# 2122 Level NS Core Physics - Course Revision Questions Electricity -Solution.pdf is a pdf!
+
+# 2122 Level NS Core Physics - Course Revision Questions Electricity.pdf is a pdf!
+# 2122 Level NS Core Physics Course Revision Questions Kinematics and Mechanics Solution.pdf is a pdf!
+
         # print(color == 'rgb(0, 128, 187)')
         bool_thing = (color == 'rgba(0, 128, 187, 1)')
         # Temporary override
-        # bool_thing = True
+        bool_thing = True
         if len(text) > 1 and bool_thing == True:
-            print(item.get_attribute('innerText') + ' is a pdf!')
             # rgb(0, 128, 187)
 
-            item.click()
-            hm = False
+            # item = item.find_element_by_css_selector('span.ng-binding')
+            if "".join(item.get_attribute('innerText').split('.pdf')[0].split()) not in all_files:
+                print(item.get_attribute('innerText').split(
+                    '.pdf')[0] + ' is a pdf!')
+                item.click()
+                all_files.append(item.get_attribute('innerText'))
+    hm = False
 
-            while hm == False:
-                def fileList():
-                    return glob.glob('./files/*.crdownload')
+    while hm == False:
+        def fileList():
+            return glob.glob('/home/james/programming/auto-download/files/*.crdownload')
 
-                if(len(fileList()) == 0):
-                    hm = True
-                else:
-                    browser.implicitly_wait(10)
+        if(len(fileList()) == 0):
+            hm = True
+        else:
+            browser.implicitly_wait(30)
+    return all_files
 
 
-def main(username, password):
+def main(username, password, all_files):
 
     clear_files()
     # driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -90,16 +104,16 @@ def main(username, password):
         items = week.find_elements_by_css_selector('li div.col-sm-4 span')
         items = items[1::2]
 
-        click_pdf_links(browser, items)
+        all_files = click_pdf_links(browser, items, all_files)
         # Once all items in a week have been downloaded, upload
         hm = False
 
         while hm == False:
-            browser.implicitly_wait(3)
+            browser.implicitly_wait(10)
 
             def fileList():
                 return glob.glob('./files/*.crdownload')
-
+            print(len(fileList()))
             if(len(fileList()) == 0):
                 hm = True
             else:
@@ -108,13 +122,14 @@ def main(username, password):
 
     browser.implicitly_wait(90)
     grid_items = get_grid(browser, term)
-    click_pdf_links(browser, grid_items)
+    all_files = click_pdf_links(browser, grid_items, all_files)
     browser.implicitly_wait(90)
 
     upload(term, 'Grid')
     # os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')
 
     browser.close()
+    return all_files
 
 
 if __name__ == '__main__':
@@ -139,9 +154,16 @@ if __name__ == '__main__':
     #     print('TIMEOUT FAILURE TRYING AGAIN')
     #     do()
     # print(len(glob.glob('./files/*.crdownload')))
-
     credentials = get_credentials()
+    all_files = list_all_files(1)
+    for file in all_files:
+        print(file)
+    print('2122 Level NS Core Physics - Course Revision Questions Electricity -Solution' not in all_files)
     for credential in credentials:
-        [username, password, account_id] = credential
-        main(username, password)
-        better_quiz_grabber(username, account_id)
+        username = credential["username"]
+        password = credential["password"]
+        account_id = credential["account_id"]
+        # [username, password, account_id] = credential
+        print(username)
+        # all_files = main(username, password, all_files)
+        all_files = better_quiz_grabber(username, account_id, all_files)

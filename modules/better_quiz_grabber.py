@@ -25,7 +25,9 @@ import json
 # from selenium.webdriver.common.keys import Keys
 
 
-def better_quiz_grabber(username, password, account_id):
+def better_quiz_grabber(username, password, account_id, all_files):
+    file_list = all_files
+
     def get_credentials():
         with open('./webschool_credentials.json') as file:
             credentials = json.loads(file.read()).credentials[0]
@@ -211,7 +213,7 @@ def better_quiz_grabber(username, password, account_id):
             url = "https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D"
             url = "https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=" + \
                 quizId + "&isDeleted=" + str(isDeleted) + "&quizLevelSectionId=" + \
-                QuizLevelSectionId + account + \
+                QuizLevelSectionId + '&accountId=' + str(account_id) + '%3D&selectedQuizSessionId=' + \
                 selectedQuizSessionId + "&scid=q7x6PiPCfek%3D"
             browser.execute_script("window.open()")
             browser.switch_to.window(browser.window_handles[1])
@@ -241,7 +243,7 @@ def better_quiz_grabber(username, password, account_id):
             url = 'https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizNavigation?id=YbYsNsltrPE%3D&quizLevelSectionId=6wg49xZNvUI%3D&scid=q7x6PiPCfek%3D&accountId=fsqh8%2Fu5ByQ%3D&sessionId=ZwhGsEbWw81VA2ac%2Bhlbag%3D%3D'
 
             url = 'https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizNavigation?id=' + str(quizId) + '&quizLevelSectionId=' + str(
-                QuizLevelSectionId) + '&scid=q7x6PiPCfek%3D&accountId=fsqh8%2Fu5ByQ%3D&sessionId=' + str(selectedQuizSessionId)
+                QuizLevelSectionId) + '&scid=q7x6PiPCfek%3D&accountId=' + str(account_id) + '&sessionId=' + str(selectedQuizSessionId)
             browser.execute_script("window.open()")
             browser.switch_to.window(browser.window_handles[1])
             browser.get(url)
@@ -266,6 +268,7 @@ def better_quiz_grabber(username, password, account_id):
             browser.implicitly_wait(1)
 
     def main():
+    
 
         clear_files()
         # driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -294,14 +297,14 @@ def better_quiz_grabber(username, password, account_id):
         print(len(weeks))
         for week in weeks:
             heading = week.find_element_by_css_selector('.panel-heading').text
-            files = get_files(heading)
-            file_list = []
-            for file in files:
-                file_list.append(str(file['name']).split('.pdf')[0])
-            for file in file_list:
-                print(file)
-            print(heading)
-
+            # files = get_files(heading)
+            # file_list = []
+            # for file in files:
+            #     file_list.append(str(file['name']).split('.pdf')[0])
+            # for file in file_list:
+            #     print(file)
+            # print(heading)
+            file_list = all_files
             # Once all items in a week have been downloaded, upload
             hm = False
             arr = week.find_elements_by_css_selector(
@@ -317,11 +320,12 @@ def better_quiz_grabber(username, password, account_id):
                 # angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId
 
                 if text.find('pdf') == -1:
-                    if text not in file_list:
-                        # print('QUIZ FOUND')
+                    if "".join(text.split()) not in file_list:
+                        print('SUS QUIZ FOUND')
                         # quizzes.remove(quizzes[index])
 
                         quiz_list.append(arr[index])
+                        file_list.append("".join(text.split()))
                         print("adding! " + text)
 
                 index = index + 1
@@ -337,8 +341,10 @@ def better_quiz_grabber(username, password, account_id):
         # os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')
 
         browser.close()
+    main()
+    return file_list
 
 
 if __name__ == '__main__':
-    main()
+    # better_quiz_grabber()
     # print(len(glob.glob('./files/*.crdownload')))

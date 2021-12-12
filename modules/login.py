@@ -12,6 +12,8 @@ def login(browser, username, password):
             return False
         else:
             return True
+    WebDriverWait(browser, 90).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '#username')))
 
     def get_credentials():
         with open('./webschool_credentials.json') as file:

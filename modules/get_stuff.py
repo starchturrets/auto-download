@@ -94,6 +94,9 @@ def get_grid(browser, term):
 
     items = WebDriverWait(browser, 900).until(
         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, 'div.panel > ul.list-group li:not(.ng-hide)')))
+    items = browser.find_elements_by_css_selector(
+        'div.panel > ul.list-group li:not(.ng-hide) span.ng-binding')
+    items = items[1::2]
 
     return items
 
