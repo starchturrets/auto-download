@@ -247,11 +247,11 @@ def login():
 def move_all_weeks_to_proper_folders():
     print()
     all_weeks = []
-    SUNDAY = ''
     MONDAY = ''
     TUESDAY = ''
     WEDNESDAY = ''
     THURSDAY = ''
+    FRIDAY = ''
 
 
 def move_items_to_proper_folders(term):
@@ -353,11 +353,12 @@ def move_items_to_proper_folders(term):
     for week in weeks:
         print(week['name'])
         id = week['id']
-        SUNDAY = find_folder('SUNDAY', id)
+        # SUNDAY = find_folder('SUNDAY', id)
         MONDAY = find_folder('MONDAY', id)
         TUESDAY = find_folder('TUESDAY', id)
         WEDNESDAY = find_folder('WEDNESDAY', id)
         THURSDAY = find_folder('THURSDAY', id)
+        FRIDAY = find_folder('FRIDAY', id)
         SATURDAY = find_folder('SATURDAY', id)
 
         files = search(id)
@@ -372,7 +373,7 @@ def move_items_to_proper_folders(term):
             id = file['id']
             if 'mock' not in name and 'final' not in name:
                 if 'periodic' in name:
-                    print('moving sunday')
+                    print('moving monday')
                     # previous_parents = ','.join(file.get('parents'))
                     if 'alevel' in ''.join(name.lower().split()):
                         print('saturday')
@@ -382,19 +383,19 @@ def move_items_to_proper_folders(term):
                     else:
                         print('sunday')
                         file = drive_service.files().update(
-                            fileId=file['id'], addParents=SUNDAY, removeParents=week['id'], fields='id, parents').execute()
-                elif 'math' in name or 'moral' in name:
-                    print('monday')
-                    move(file['id'], week['id'], MONDAY)
-                elif 'levelchemistry' in name or 'economics' in name:
+                            fileId=file['id'], addParents=MONDAY, removeParents=week['id'], fields='id, parents').execute()
+                elif 'math' in name or 'moral' in name  or 'apstatistics' in name:
                     print('tuesday')
                     move(file['id'], week['id'], TUESDAY)
-                elif 'asstatistics' in name or 'chemistry' in name or 'alevelphysics' in name:
+                elif 'levelchemistry' in name or 'economics' in name or 'biology' in name:
                     print('wednesday')
                     move(file['id'], week['id'], WEDNESDAY)
-                elif 'apcomputerscience' in name or 'history' in name or 'physics' in name or 'business' in name:
+                elif 'asstatistics' in name or 'nchemistry' in name or 'alevelphysics' in name or 'apcomputerscience' in name or 'apphysicsc' in name:
                     print('thursday')
                     move(file['id'], week['id'], THURSDAY)
+                elif 'history' in name or 'physics' in name or 'business' in name:
+                    print('friday')
+                    move(file['id'], week['id'], FRIDAY)
 
 
 def list_all_files(term):
@@ -477,4 +478,4 @@ def list_all_files(term):
 
 
 # list_all_files('1uHWkp3CT4P5TtxH3NRG6wcXyJAwyhMNi')
-move_items_to_proper_folders(1)
+# move_items_to_proper_folders(1)

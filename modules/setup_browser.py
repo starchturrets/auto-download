@@ -24,6 +24,6 @@ def setup_browser():
     #     'download': {'default_directory': '/home/james/programming/auto-download/files', 'directory_upgrade': True}}
     # options.add_experimental_option('prefs', prefs)
     browser = webdriver.Chrome(
-        executable_path="chromedriver", port=0, options=options)
+        executable_path='/home/james/.wdm/drivers/chromedriver/linux64/97.0.4692.71/chromedriver', port=0, options=options)
 
     return browser

@@ -1,0 +1,8 @@
+2022/01/07-13:52:23.816 5 Creating DB /home/james/programming/auto-download/profile/Default/Session Storage since it was missing.
+2022/01/07-13:52:23.977 5 Reusing MANIFEST /home/james/programming/auto-download/profile/Default/Session Storage/MANIFEST-000001
+2022/01/07-14:18:27.310 a Level-0 table #5: started
+2022/01/07-14:18:27.415 a Level-0 table #5: 14495 bytes OK
+2022/01/07-14:18:27.486 a Delete type=0 #3
+2022/01/07-14:33:27.308 a Level-0 table #7: started
+2022/01/07-14:33:27.427 a Level-0 table #7: 15480 bytes OK
+2022/01/07-14:33:27.541 a Delete type=0 #4

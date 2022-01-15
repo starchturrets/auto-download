@@ -60,7 +60,8 @@ def better_quiz_grabber(username, password, account_id, all_files):
             browser.switch_to.default_content()
         table = WebDriverWait(browser, 90).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, 'table.quiz-result-table')))
-
+        browser.execute_script(
+            'arguments[0].style.display="none"', browser.find_element_by_css_selector('.col-md-5'))
         browser.execute_script(
             'angular.element(document.querySelector("div.quiz-result")).scope().onlineQuizResultCtrl.quizResultsEntries.forEach(ans=> ans.hasAnswer="enabled")')
         browser.implicitly_wait(10)
@@ -166,25 +167,21 @@ def better_quiz_grabber(username, password, account_id, all_files):
         def quiz_done():
             radio_btn = browser.find_element_by_css_selector(
                 'input[type="radio"][value="viewHistoryRdb"]')
-            # return radio_btn.is_displayed()
-            return False
-        item.click()
+            return radio_btn.is_displayed()
+            # return False
+        # item.click()
+        browser.execute_script('arguments[0].click()', item)
         WebDriverWait(browser, 90).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#QuizDescription')))
-
+        inactive = False
+        if(len(browser.find_elements_by_css_selector(
+                '#inactiveOkBtn')) > 0):
+            inactive = browser.find_element_by_css_selector(
+                '#inactiveOkBtn').is_displayed()
+            if(inactive == True):
+                browser.find_element_by_css_selector(
+                    '#inactiveOkBtn').click()
     # ng-hide="!documentsCtrl.popupOnlineQuizModelCenter.hasHistory"
-        quizId = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupId")
-        isDeleted = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.isDeleted")
-        QuizLevelSectionId = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupQuizLevelSectionId")
-        selectedQuizSessionId = browser.execute_script(
-            "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId")
-        # print(id) "&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId="
-        # https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D
-        # account = '&accountId=makQjpBwEjI%3D&selectedQuizSessionId='
-        account = '&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId='
 
         def create_pdf():
             print('Creating PDF')
@@ -206,15 +203,28 @@ def better_quiz_grabber(username, password, account_id, all_files):
                 imgs.append(im)
             imgs[0].save('files/' + title + '.pdf', save_all=True,
                          quality=100, append_images=imgs[1:])
-        if(quiz_done() == True):
+        done = False
 
+        if(quiz_done() == True and inactive == False):
+            quizId = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupId")
+            isDeleted = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.isDeleted")
+            QuizLevelSectionId = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupQuizLevelSectionId")
+            selectedQuizSessionId = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId")
+            # print(id) "&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId="
+            # https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D
+            # account = '&accountId=makQjpBwEjI%3D&selectedQuizSessionId='
+            account = '&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId='
             # https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=fsqh8%2Fu5ByQ%3D&scid=q7x6PiPCfek%3D
             # 9LSVbWcCJbhokrN%2FCOQORw%3D%3D
             url = "https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D"
             url = "https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=" + \
                 quizId + "&isDeleted=" + str(isDeleted) + "&quizLevelSectionId=" + \
                 QuizLevelSectionId + '&accountId=' + str(account_id) + '%3D&selectedQuizSessionId=' + \
-                selectedQuizSessionId + "&scid=q7x6PiPCfek%3D"
+                str(selectedQuizSessionId) + "&scid=q7x6PiPCfek%3D"
             browser.execute_script("window.open()")
             browser.switch_to.window(browser.window_handles[1])
             browser.get(url)
@@ -236,28 +246,48 @@ def better_quiz_grabber(username, password, account_id, all_files):
 
             browser.find_element_by_css_selector('#activeCancelBtn').click()
 
-        elif(quiz_done() == False):
+        elif(quiz_done() == False and inactive == False):
+            quizId = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupId")
+            isDeleted = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.isDeleted")
+            QuizLevelSectionId = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupQuizLevelSectionId")
+            selectedQuizSessionId = browser.execute_script(
+                "return angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId")
+        # print(id) "&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId="
+        # https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizResult?quizId=cMfsocEJJZM%3D&isDeleted=0&quizLevelSectionId=XeffvsJs7zs%3D&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId=9LSVbWcCJbhokrN%2FCOQORw%3D%3D&scid=q7x6PiPCfek%3D
+        # account = '&accountId=makQjpBwEjI%3D&selectedQuizSessionId='
+            account = '&accountId=fsqh8%2Fu5ByQ%3D&selectedQuizSessionId='
             print('Quiz has not yet been attempted')
             # popupid, popupquizlevelsectionid, scid, accountid, sessionid
 
             url = 'https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizNavigation?id=YbYsNsltrPE%3D&quizLevelSectionId=6wg49xZNvUI%3D&scid=q7x6PiPCfek%3D&accountId=fsqh8%2Fu5ByQ%3D&sessionId=ZwhGsEbWw81VA2ac%2Bhlbag%3D%3D'
 
             url = 'https://digitalplatform.sabis.net/Pages/OnlineQuiz/OnlineQuizNavigation?id=' + str(quizId) + '&quizLevelSectionId=' + str(
-                QuizLevelSectionId) + '&scid=q7x6PiPCfek%3D&accountId=' + str(account_id) + '&sessionId=' + str(selectedQuizSessionId)
+                QuizLevelSectionId) + '&scid=q7x6PiPCfek%3D&accountId=' + str(account_id) + '%3D&sessionId=' + str(selectedQuizSessionId) + "%3D"
             browser.execute_script("window.open()")
             browser.switch_to.window(browser.window_handles[1])
             browser.get(url)
+            # print('URL IS')
+            # print(url)
             # submit quiz (twice)
 
-            def submit_btn():
-                return WebDriverWait(browser, 90).until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, '[ng-click="onlineQuizNavigationCtrl.submitQuiz(true)"]')))
-            submit_btn().click()
-            WebDriverWait(browser, 90).until(EC.alert_is_present())
-            browser.switch_to.alert.accept()
-            submit_btn().click()
-            WebDriverWait(browser, 90).until(EC.alert_is_present())
-            browser.switch_to.alert.accept()
+            def confirm():
+                WebDriverWait(browser, 900).until(
+                    EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+
+                button = browser.find_element_by_css_selector(
+                    '[ng-click="onlineQuizNavigationCtrl.submitQuiz(true)"]')
+                browser.execute_script(
+                    'angular.element(arguments[0]).scope().onlineQuizNavigationCtrl.submitQuiz(true)', button)
+                WebDriverWait(browser, 90).until(EC.alert_is_present())
+
+                browser.switch_to.alert.accept()
+
+            confirm()
+            browser.implicitly_wait(20)
+            confirm()
             get_questions(browser, title)
             create_pdf()
             browser.close()
@@ -268,7 +298,6 @@ def better_quiz_grabber(username, password, account_id, all_files):
             browser.implicitly_wait(1)
 
     def main():
-    
 
         clear_files()
         # driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -279,22 +308,23 @@ def better_quiz_grabber(username, password, account_id, all_files):
         #     'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
         browser.get('https://sdpauth.sabis.net/')
 
-        login(browser)
+        login(browser, username, password)
 
         browser.get(
             'https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=&scid=q7x6PiPCfek%3D')
 
-        term = 1
+        term = 2
         weeks = get_weeks(browser)
         weeks.pop(0)
-        weeks.pop(0)
+
+        # weeks.pop(0)
 
         print('It is term: {term}'.format(term=term))
         browser.implicitly_wait(1)
         browser.execute_script(
             "document.querySelector('a.accept.button').click()")
         browser.implicitly_wait(15)
-        print(len(weeks))
+        # print(len(weeks))
         for week in weeks:
             heading = week.find_element_by_css_selector('.panel-heading').text
             # files = get_files(heading)
@@ -319,6 +349,7 @@ def better_quiz_grabber(username, password, account_id, all_files):
                 # print(text.find('pdf'))
                 # angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId
 
+                # print('test' + text)
                 if text.find('pdf') == -1:
                     if "".join(text.split()) not in file_list:
                         print('SUS QUIZ FOUND')
@@ -345,6 +376,6 @@ def better_quiz_grabber(username, password, account_id, all_files):
     return file_list
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # better_quiz_grabber()
     # print(len(glob.glob('./files/*.crdownload')))

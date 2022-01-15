@@ -16,11 +16,15 @@ from modules.get_stuff import get_grid
 from webdriver_manager.chrome import ChromeDriverManager
 from modules.better_quiz_grabber import better_quiz_grabber
 # from selenium.webdriver.common.keys import Keys
+# from modules.submit_all_quizzes import submit_all_quizzes
+from modules.upload import move_items_to_proper_folders
+
+from submit_all_quizzes import submit_all_quizzes
 
 
 def get_credentials():
     with open('./webschool_credentials.json') as file:
-        credentials = json.loads(file.read())["credentials_test"]
+        credentials = json.loads(file.read())["credentials_prod"]
         print(credentials)
         return credentials
 
@@ -93,7 +97,7 @@ def main(username, password, all_files):
     browser.get(
         'https://digitalplatform.sabis.net/Pages/ExamPreparation/ExamPreparation?a=&scid=q7x6PiPCfek%3D')
 
-    term = 1
+    term = 2
     weeks = get_weeks(browser)
 
     print('It is term: {term}'.format(term=term))
@@ -136,13 +140,26 @@ if __name__ == '__main__':
     # def do():
     #     try:
     #         credentials = get_credentials()
+    #         all_files = list_all_files(2)
+    #         for file in all_files:
+    #             print(file)
+
     #         for credential in credentials:
-    #             [username ,password] = credential
-    #             main(username, password)
-    #             schedule.every(5).minutes.do(main)
-    #             while True:
-    #                 schedule.run_pending()
-    #                 time.sleep(1)
+    #             username = credential["username"]
+    #             password = credential["password"]
+    #             account_id = credential["account_id"]
+    #             # [username, password, account_id] = credential
+    #             print(username)
+    #             # submit_all_quizzes(username, password)
+    #             all_files = main(username, password, all_files)
+    #             all_files = better_quiz_grabber(
+    #                 username, password, account_id, all_files)
+    #             move_items_to_proper_folders(2)
+
+    #             # schedule.every(5).minutes.do(main)
+    #             # while True:
+    #             #     schedule.run_pending()
+    #             #     time.sleep(1)
     #     except:
     #         print('TIMEOUT FAILURE TRYING AGAIN')
     #         do()
@@ -155,15 +172,15 @@ if __name__ == '__main__':
     #     do()
     # print(len(glob.glob('./files/*.crdownload')))
     credentials = get_credentials()
-    all_files = list_all_files(1)
-    for file in all_files:
-        print(file)
-    print('2122 Level NS Core Physics - Course Revision Questions Electricity -Solution' not in all_files)
+    all_files = list_all_files(2)
+
     for credential in credentials:
         username = credential["username"]
         password = credential["password"]
         account_id = credential["account_id"]
         # [username, password, account_id] = credential
         print(username)
-        # all_files = main(username, password, all_files)
-        all_files = better_quiz_grabber(username, account_id, all_files)
+        all_files = main(username, password, all_files)
+        all_files = better_quiz_grabber(
+            username, password, account_id, all_files)
+        move_items_to_proper_folders(2)
