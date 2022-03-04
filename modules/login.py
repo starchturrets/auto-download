@@ -62,7 +62,7 @@ def login_ebooks(browser):
         login_btn = browser.find_element_by_css_selector('button.login-btn')
         browser.execute_script(
             'arguments[0].removeAttribute("disabled")', login_btn)
-        # browser.execute_script(
-        #     "document.querySelector('div.cookie-bar').style.display = 'none'")
+        browser.execute_script(
+            "document.querySelector('div.cookie-bar').style.display = 'none'")
         login_btn.click()
         print('Logging in!')

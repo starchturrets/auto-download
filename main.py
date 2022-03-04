@@ -36,7 +36,9 @@ def clear_files():
 
 
 def click_pdf_links(browser, items, all_files):
-
+    arr = []
+    browser.execute_script(
+        'let bar=document.querySelector("div.no-print.cookie-bar");if(bar){bar.remove()}')
     for item in items:
 
         browser.execute_script('arguments[0].scrollIntoView(true)', item)
@@ -67,7 +69,8 @@ def click_pdf_links(browser, items, all_files):
                 print(item.get_attribute('innerText').split(
                     '.pdf')[0] + ' is a pdf!')
                 item.click()
-                all_files.append(item.get_attribute('innerText'))
+                all_files.append("".join(item.get_attribute(
+                    'innerText').split('.pdf')[0].split()))
     hm = False
 
     while hm == False:
@@ -88,8 +91,7 @@ def main(username, password, all_files):
     # driver = webdriver.Chrome('/usr/local/share/chromedriver~')
     # driver = webdriver.Chrome()
     browser = setup_browser()
-    # os.system(
-    #     'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
+
     browser.get('https://sdpauth.sabis.net/')
 
     login(browser, username, password)
@@ -114,6 +116,7 @@ def main(username, password, all_files):
 
         while hm == False:
             browser.implicitly_wait(10)
+            time.sleep(5)
 
             def fileList():
                 return glob.glob('./files/*.crdownload')
@@ -121,6 +124,7 @@ def main(username, password, all_files):
             if(len(fileList()) == 0):
                 hm = True
             else:
+                time.sleep(5)
                 browser.implicitly_wait(10)
         upload(term, heading)
 
@@ -130,7 +134,6 @@ def main(username, password, all_files):
     browser.implicitly_wait(90)
 
     upload(term, 'Grid')
-    # os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')
 
     browser.close()
     return all_files
@@ -173,7 +176,12 @@ if __name__ == '__main__':
     # print(len(glob.glob('./files/*.crdownload')))
     credentials = get_credentials()
     all_files = list_all_files(2)
-
+    os.system(
+        'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
+    # for credential in credentials:
+    #     username = credential["username"]
+    #     password = credential["password"]
+    #     submit_all_quizzes(username, password)
     for credential in credentials:
         username = credential["username"]
         password = credential["password"]
@@ -184,3 +192,5 @@ if __name__ == '__main__':
         all_files = better_quiz_grabber(
             username, password, account_id, all_files)
         move_items_to_proper_folders(2)
+
+    os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')

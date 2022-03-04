@@ -117,39 +117,40 @@ def submit_all_quizzes(username, password):
             print(f'length of quiz_list variable is {len(quiz_list)}')
         return quiz_list
     # load_all_weeks(browser)
+    quizzes = load_all_weeks(browser)
 
-    while True:
-        quizzes = load_all_weeks(browser)
-        if len(quizzes) == 0:
-            browser.close()
-            break
-        elif len(quizzes) > 0:
-            browser.execute_script(
-                'arguments[0].scrollIntoView()', quizzes[0])
-            div = quizzes[0].find_element_by_css_selector('div')
-            div.click()
-            WebDriverWait(browser, 90).until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#QuizDescription')))
-            browser.find_element_by_css_selector('#activeOkBtn').click()
+    while len(quizzes) > 0:
 
-            def confirm():
-                WebDriverWait(browser, 900).until(
-                    EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+        browser.execute_script(
+            'arguments[0].scrollIntoView()', quizzes[0])
+        div = quizzes[0].find_element_by_css_selector('div')
+        div.click()
+        WebDriverWait(browser, 90).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#QuizDescription')))
+        browser.find_element_by_css_selector('#activeOkBtn').click()
 
-                button = browser.find_element_by_css_selector(
-                    '[ng-click="onlineQuizNavigationCtrl.submitQuiz(true)"]')
-                browser.execute_script(
-                    'angular.element(arguments[0]).scope().onlineQuizNavigationCtrl.submitQuiz(true)', button)
-                WebDriverWait(browser, 90).until(EC.alert_is_present())
-
-                browser.switch_to.alert.accept()
-
-            confirm()
-            browser.implicitly_wait(15)
-            confirm()
-            browser.implicitly_wait(15)
+        def confirm():
             WebDriverWait(browser, 900).until(
                 EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
 
+            button = browser.find_element_by_css_selector(
+                '[ng-click="onlineQuizNavigationCtrl.submitQuiz(true)"]')
+            browser.execute_script(
+                'angular.element(arguments[0]).scope().onlineQuizNavigationCtrl.submitQuiz(true)', button)
+            WebDriverWait(browser, 90).until(EC.alert_is_present())
 
-# submit_all_quizzes('Jim', 'password')
+            browser.switch_to.alert.accept()
+
+        confirm()
+        time.sleep(2)
+        browser.implicitly_wait(15)
+        confirm()
+        time.sleep(2)
+        browser.implicitly_wait(15)
+        WebDriverWait(browser, 900).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+        quizzes = load_all_weeks(browser)
+
+    browser.close()
+
+# submit_all_quizzes("Jim", "password")

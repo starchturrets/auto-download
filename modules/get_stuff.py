@@ -2,6 +2,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
+import time
+
 
 def get_weeks(browser):
 
@@ -11,24 +13,10 @@ def get_weeks(browser):
                 (By.CSS_SELECTOR, selector)))
         el.click()
 
-    # wait_and_click(
-    #     '[ng-class="{selected: documentsCtrl.selectCurrentTermWeek}"]')
-
-    # browser.implicitly_wait(10)
-
-    # term = WebDriverWait(browser, 900).until(
-    #     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div.filter.data b.ng-binding'))).text
-
-    # term = term.split('Term')[1].strip()
-
-    # term = int(term)
-    # # print('TERM')
-    # # print(term)
-    wait_and_click("""[ng-click="documentsCtrl.filterSelection('Week');"]""")
-    # WebDriverWait(browser, 900).until(
-    #     EC.element_to_be_clickable(
-    #         (By.CSS_SELECTOR, '.all-week-label span')))
-
+    # wait_and_click("""[ng-click="documentsCtrl.filterSelection('Week');"]""")
+    wait_and_click("[ng-click='mainMenuCtrl.mobileFilter()']")
+    wait_and_click(
+        "[ng-class='{ open: documentsCtrl.weekFilterClassOpen , data: documentsCtrl.weekFilterClassData , hidden: documentsCtrl.hideTermWeekFilters}']")
     index = browser.find_elements_by_css_selector(
         'div.filter.data.open b.ng-binding')[0].get_attribute('innerText').split('Week')[1]
 
@@ -58,6 +46,7 @@ def get_weeks(browser):
         'div.panel.ng-scope')
     WebDriverWait(browser, 900).until(
         EC.invisibility_of_element_located((By.CSS_SELECTOR, 'div#loading-bar')))
+    time.sleep(15)
     browser.implicitly_wait(20)
     shuld_wait = True
     # weeks = browser.find_elements_by_css_selector(
@@ -85,6 +74,7 @@ def get_weeks(browser):
 
     # return [arr, term]
     browser.implicitly_wait(15)
+    time.sleep(2)
     return arr
 
 

@@ -22,7 +22,7 @@ from modules.get_stuff import get_weeks
 from modules.get_stuff import get_grid
 from webdriver_manager.chrome import ChromeDriverManager
 import json
-# from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.keys import Keys
 
 
 def better_quiz_grabber(username, password, account_id, all_files):
@@ -41,9 +41,10 @@ def better_quiz_grabber(username, password, account_id, all_files):
             fullpath = os.path.join(path, item)
             if os.path.isfile(fullpath):
                 im = Image.open(fullpath)
+                width, height = im.size
                 f, e = os.path.splitext(fullpath)
                 # print(item)
-                imcrop = im.crop((447, 179, 1903, 1080))
+                imcrop = im.crop((310, 0, width, height))
                 imcrop.save(f+'.png', 'PNG', quality=100)
 
     def get_questions(browser, title):
@@ -70,7 +71,15 @@ def better_quiz_grabber(username, password, account_id, all_files):
         questions = browser.find_elements_by_css_selector(
             'table.quiz-result-table tr.ng-scope')
 
+        def remove_top_elements():
+            selectors = ['div.product-header', 'div.navbar-header',
+                         'h2', 'div.no-print', 'div.col-sm-4']
+            for selector in selectors:
+                element = browser.find_element_by_css_selector(selector)
+                browser.execute_script("arguments[0].remove()", element)
+        remove_top_elements()
         for index, question in enumerate(questions):
+            browser.execute_script("arguments[0].scrollIntoView()", question)
             question.click()
             # if index == 0:
             #     print('wait one')
@@ -81,6 +90,8 @@ def better_quiz_grabber(username, password, account_id, all_files):
 
             browser.find_element_by_css_selector(
                 'div.correct-answer-image').click()
+            browser.find_element_by_tag_name(
+                'body').send_keys(Keys.CONTROL + Keys.HOME)
             # wait for correct answer
             WebDriverWait(browser, 90).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.odt-panel-hidden-remove')))
@@ -92,12 +103,26 @@ def better_quiz_grabber(username, password, account_id, all_files):
                 EC.visibility_of_element_located((By.CSS_SELECTOR, 'div#showCorrectAnswerContent.content.animate-right-content')))
             print(3)
             # screenshot
+            iframe = browser.find_element_by_css_selector(
+                'iframe#correctQuizQuestionActivity')
+            browser.execute_script(
+                "arguments[0].style.height=arguments[0].scrollHeight", iframe)
             browser.implicitly_wait(1)
             sus()
             print('screenshotting: ' + str(index))
             path = 'screenshots/' + str(index) + '.png'
-            browser.implicitly_wait(1)
+            time.sleep(3)
+            browser.implicitly_wait(5)
+            original_size = browser.get_window_size()
+            required_width = browser.execute_script(
+                'return document.body.parentNode.scrollWidth')
+
+            required_height = browser.execute_script(
+                'return document.body.parentNode.scrollHeight')
+            browser.set_window_size(required_width, required_height)
             browser.save_screenshot(path)
+            browser.set_window_size(
+                original_size['width'], original_size['height'])
             browser.implicitly_wait(1)
             # click exit button
             close_btn = browser.find_element_by_css_selector(
@@ -284,9 +309,10 @@ def better_quiz_grabber(username, password, account_id, all_files):
                 WebDriverWait(browser, 90).until(EC.alert_is_present())
 
                 browser.switch_to.alert.accept()
-
+            time.sleep(5)
             confirm()
             browser.implicitly_wait(20)
+            time.sleep(5)
             confirm()
             get_questions(browser, title)
             create_pdf()
@@ -324,6 +350,7 @@ def better_quiz_grabber(username, password, account_id, all_files):
         browser.execute_script(
             "document.querySelector('a.accept.button').click()")
         browser.implicitly_wait(15)
+        time.sleep(3)
         # print(len(weeks))
         for week in weeks:
             heading = week.find_element_by_css_selector('.panel-heading').text
@@ -349,8 +376,9 @@ def better_quiz_grabber(username, password, account_id, all_files):
                 # print(text.find('pdf'))
                 # angular.element(document.querySelector('#activeOkBtn')).scope().documentsCtrl.popupOnlineQuizModelCenter.popupSessionQuizId
 
-                # print('test' + text)
+                print('test' + text)
                 if text.find('pdf') == -1:
+                    print(text)
                     if "".join(text.split()) not in file_list:
                         print('SUS QUIZ FOUND')
                         # quizzes.remove(quizzes[index])
