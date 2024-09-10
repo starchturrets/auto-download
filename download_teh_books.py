@@ -7,6 +7,7 @@ import os
 import glob
 import selenium
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import img2pdf
 from PIL import Image
 from modules.setup_browser import setup_browser
@@ -45,38 +46,43 @@ def main():
     # clear_files()
 
     # os.makedirs('files/' + 'test_directory')
-    browser = setup_browser(webdriver)
-
+ #   browser = setup_browser(webdriver)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    
+    browser = webdriver.Chrome(options=chrome_options)
+    browser.maximize_window()                          
     browser.get('https://master-cms.sabis.net/login')
+    
     print('y u no login?')
     login_ebooks(browser)
 
     def subjects_list():
         WebDriverWait(browser, 90).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, '.bookshlef-body > div.ng-star-inserted > ebook-bookshelf-item-slider')))
-        return browser.find_elements_by_css_selector(
+        return browser.find_elements(By.CSS_SELECTOR,   
             '.bookshlef-body > div.ng-star-inserted > ebook-bookshelf-item-slider')
 
-    index_subjects = 6
+    index_subjects = 1
     while index_subjects < len(subjects_list()):
         subject = subjects_list()[index_subjects]
         browser.execute_script(
             'arguments[0].scrollIntoView(true)', subject)
 
-        subject_name = subject.find_element_by_css_selector('.slider-title')
+        subject_name = subject.find_element(By.CSS_SELECTOR,'.slider-title')
         subject_name = subject_name.get_attribute('innerText')
 
         print('Subject: ' + subject_name)
         if os.path.exists('files/' + subject_name) == False:
             os.makedirs('files/' + subject_name)
 
-        books = subject.find_elements_by_css_selector(
+        books = subject.find_elements(By.CSS_SELECTOR,  
             'ebook-bookshelf-item')
 
         def books_list():
-            return subjects_list()[index_subjects].find_elements_by_css_selector('ebook-bookshelf-item')
+            return subjects_list()[index_subjects].find_elements(By.CSS_SELECTOR,   'ebook-bookshelf-item')
 
-        index_books = 0
+        index_books = 1 
         while index_books < len(books_list()):
             def book():
                 return books_list()[index_books]
@@ -86,7 +92,7 @@ def main():
                     EC.presence_of_element_located((By.CSS_SELECTOR, 'iframe#master.hidden')))
 
                 browser.implicitly_wait(1)
-                iframe_elements = browser.find_elements_by_css_selector(
+                iframe_elements = browser.find_elements(By.CSS_SELECTOR,    
                     'div.page-view-wrapper.twoPages')
 
                 if len(iframe_elements) == 2:
@@ -104,7 +110,7 @@ def main():
 
             def screenshot_pages(index_canvas, index_pages):
                 def canvas_list():
-                    return browser.find_elements_by_css_selector(
+                    return browser.find_elements(By.CSS_SELECTOR,   
                         'canvas.upper-canvas')
 
                 def filter_function(item):
@@ -126,11 +132,11 @@ def main():
             def load_next():
                 # print('Loading next!')
 
-                next_btn = browser.find_elements_by_css_selector(
+                next_btn = browser.find_elements(By.CSS_SELECTOR,   
                     'div.navigationButton.next')[1]
                 next_btn.click()
 
-            info_btn = book().find_element_by_css_selector(
+            info_btn = book().find_element(By.CSS_SELECTOR,
                 'span.item-info-button')
             browser.execute_script('arguments[0].click()', info_btn)
 
@@ -140,14 +146,14 @@ def main():
             title = title_div.get_attribute('innerText')
             print(title)
 
-            close_btn = browser.find_element_by_css_selector(
+            close_btn = browser.find_element(By.CSS_SELECTOR,
                 'button[aria-label="Close"]')
             close_btn.click()
 
             browser.execute_script('arguments[0].scrollIntoView(true)', book())
             os.makedirs('files/' + subject_name + '/' + title)
 
-            book().click()
+            book().click()  
     #       load first page
     #       Improve await function
             # WebDriverWait(browser, 90).until(
@@ -173,11 +179,11 @@ def main():
 
             def end_reached():
                 # browser.implicitly_wait(1)
-                hmm = len(browser.find_elements_by_css_selector(
+                hmm = len(browser.find_elements(By.CSS_SELECTOR,    
                     'div.navigationButton.next[hidden]')) == 2
                 # print(hmm)
                 return hmm
-                # return len(browser.find_elements_by_css_selector('div.navigationButton.next[hidden]')) == 2
+                # return len(browser.find_elements(By.CSS_SELECTOR, 'div.navigationButton.next[hidden]')) == 2
 
             def reopen_book(book):
                 browser.get(

@@ -9,17 +9,17 @@ import json
 from modules.setup_browser import setup_browser
 from modules.login import login
 from modules.download import download
-from modules.upload import upload
-from modules.upload import list_all_files
+#from modules.upload import upload
+#from modules.upload import list_all_files
 from modules.get_stuff import get_weeks
 from modules.get_stuff import get_grid
 from webdriver_manager.chrome import ChromeDriverManager
-from modules.better_quiz_grabber import better_quiz_grabber
+#from modules.better_quiz_grabber import better_quiz_grabber
 # from selenium.webdriver.common.keys import Keys
 # from modules.submit_all_quizzes import submit_all_quizzes
-from modules.upload import move_items_to_proper_folders
+#from modules.upload import move_items_to_proper_folders
 
-from submit_all_quizzes import submit_all_quizzes
+#from submit_all_quizzes import submit_all_quizzes
 
 
 def get_credentials():
@@ -133,7 +133,7 @@ def main(username, password, all_files):
     all_files = click_pdf_links(browser, grid_items, all_files)
     browser.implicitly_wait(90)
 
-    upload(term, 'Grid')
+ #   upload(term, 'Grid')
 
     browser.close()
     return all_files
@@ -175,9 +175,9 @@ if __name__ == '__main__':
     #     do()
     # print(len(glob.glob('./files/*.crdownload')))
     credentials = get_credentials()
-    all_files = list_all_files(2)
-    os.system(
-        'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
+    #   all_files = list_all_files(2)
+#    os.system(
+#        'xdg-user-dirs-update --set DOWNLOAD /home/james/programming/auto-download/files')
     # for credential in credentials:
     #     username = credential["username"]
     #     password = credential["password"]
@@ -193,4 +193,4 @@ if __name__ == '__main__':
             username, password, account_id, all_files)
         move_items_to_proper_folders(2)
 
-    os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')
+#   os.system('xdg-user-dirs-update --set DOWNLOAD /home/james/Downloads')
